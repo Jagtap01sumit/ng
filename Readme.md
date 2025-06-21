@@ -85,4 +85,95 @@ app.html
 </main>
 ```
 
-#### This setup creates a clean, modular component structure where multiple child components dynamically render course data based on the @Input() provided from the parent. This is ideal for UI components like cards, lists, or reusable widgets in Angular apps.
+##### This setup creates a clean, modular component structure where multiple child components dynamically render course data based on the @Input() provided from the parent. This is ideal for UI components like cards, lists, or reusable widgets in Angular apps.
+
+---
+
+---
+
+# Custome Events
+
+### Angular Component Communication with @Output()
+
+This section explains how to use `@Output()` in Angular to create custom event emitters, enabling communication from **child components to parent components**.
+
+---
+
+### ✅ What is `@Output()`?
+
+- `@Output()` is a decorator in Angular.
+- It allows a **child component** to emit events that a **parent component** can listen to.
+
+---
+
+### 🔧 Use Case
+
+- You want a child component (e.g. `CourseCardComponent`) to notify the parent (e.g. `AppComponent`) when something happens—like a button click.
+
+---
+
+## 📄 Example
+
+- here we just create event in child component , so our event name is "courseSelected"
+- the browser in build event name is click same like this our custom event name is "courseSelected"
+
+### 🧩 Child Component: `course-card.component.ts`
+
+```ts
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { COURSE } from "../data/db-data";
+import { Course } from "../app/model/course";
+
+@Component({
+    selector: 'course-card',
+    templateUrl: './course-card.component.html',
+    styleUrls: ['./course-card.component.css']
+
+})
+
+export class CourseCardComponent implements OnInit {
+
+    @Input({
+        required: true
+    }
+    )
+    course!: Course;
+
+    @Output()
+    courseSelected = new EventEmitter<Course>();
+
+    onCourseViewed() {
+        console.log("card component - button clicked")
+        this.courseSelected.emit(this.course);
+    }
+    constructor() { }
+    ngOnInit(): void {
+
+    }
+```
+
+### Parent Component Template: app.html
+
+```html
+<course-card (courseSelected)="onCourseSelected($event)"></course-card>
+```
+
+### Parent clas component: app.ts
+
+```ts
+export class AppComponent {
+  onCourseSelected(course: string) {
+    console.log("Course selected:", course);
+  }
+}
+```
+
+#### We can also use this event emiiter like this:
+
+```ts
+//if we want our name of event emitter is "courseSelected", so we can mention it in decorator as string
+@Output('courseSelected')
+eventEmiiter = new EventEmitter<Course>();
+
+
+```

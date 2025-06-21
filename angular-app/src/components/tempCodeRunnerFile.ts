@@ -17,12 +17,12 @@ export class CourseCardComponent implements OnInit {
     )
     course!: Course;
 
-    @Output('courseSelected')
-    eventEmitter = new EventEmitter<Course>();
+    @Output()
+    courseSelected = new EventEmitter<Course>();
 
     onCourseViewed() {
         console.log("card component - button clicked")
-        this.eventEmitter.emit(this.course);
+        this.courseSelected.emit(this.course);
     }
 
     constructor() { }

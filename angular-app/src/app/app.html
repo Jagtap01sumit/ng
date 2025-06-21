@@ -1,6 +1,6 @@
 <main class="main">
   <div class="content">
-    <course-card [course]="coreCourse"></course-card>
+    <course-card (courseSelected)="onCourseSelected($event)" [course]="coreCourse"></course-card>
     <course-card [course]="rxjsCourse"></course-card>
     <course-card [course]="ngrxCourse"></course-card>
   </div>
