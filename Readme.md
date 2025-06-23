@@ -1,3 +1,18 @@
+# Angular Setup
+
+```
+npm install -g @angular/cli
+ng
+ng new angular-course
+
+```
+
+### State Management Approach
+
+###### Old Way: Using Decorators (@Input(), @Output())
+
+###### New Way: Using Signals (signal(), computed(), etc.)
+
 # 📘 Angular Example: Passing Data from Parent to Child Components Using `@Input()`
 
 This example demonstrates how to pass data from a parent component (`AppComponent`) to a reusable child component (`CourseCardComponent`) using Angular's `@Input()` decorator.
@@ -162,7 +177,7 @@ export class CourseCardComponent implements OnInit {
 
 ```ts
 export class AppComponent {
-  onCourseSelected(course: string) {
+  onCourseSelected(course: Course) {
     console.log("Course selected:", course);
   }
 }
@@ -177,3 +192,39 @@ eventEmiiter = new EventEmitter<Course>();
 
 
 ```
+
+---
+
+---
+
+## Control Flow Primitives
+
+```html
+//“Use the id property of each course object to track its identity in the list.”
+// we just want uniqueness, so we can also use @for (item of items; track
+$index) { ... } @for(course of courses; track course.id ){ @for(course of
+courses; track course.id; let i = $index;let first=$first; let last = $last; let
+even= $even; let odd= $odd ){
+<course-card
+  (courseSelected)="onCourseSelected($event)"
+  [index]="i"
+  [course]="course"
+  [class.is-first]="first"
+  [class.is-last]="last"
+  [class.is-even]="even"
+  [class.is-odd]="odd"
+/>
+} @empty{
+<h1>No Course Found</h1>
+} }
+```
+
+$odd
+| Variable | Description                                          |
+| -------- | ---------------------------------------------------- |
+| `$index`| The index of the current item in the array           |
+|`$count` | Total number of items                                |
+| `$first`|`true`if the current item is the first in the array   |
+|`$last`  | `true` if the current item is the last in the array  |
+| `$even` |`true`for even-indexed items                          |
+|`$odd`   |`true` for odd-indexed items |
