@@ -1,7 +1,15 @@
 <main class="main">
   <div class="content">
-    <course-card [course]="coreCourse"></course-card>
-    <course-card [course]="rxjsCourse"></course-card>
-    <course-card [course]="ngrxCourse"></course-card>
+
+    @for(course of courses; track course.id; let i = $index;let first=$first; let last = $last; let even= $even; let
+    odd= $odd ){
+    <course-card (courseSelected)="onCourseSelected($event)" [index]="i" [course]="course" [class.is-first]="first"
+      [class.is-last]="last" [class.is-even]="even" [class.is-odd]="odd" />
+    }
+
+    @empty{
+    <h1>No Course Found</h1>
+    }
+
   </div>
 </main>

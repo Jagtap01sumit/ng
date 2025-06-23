@@ -1,0 +1,58 @@
+.course-card {
+    width: 320px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin: 20px;
+    transition: transform 0.3s ease;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+}
+
+.course-title {
+    background-color: #2b6cb0;
+    color: white;
+    padding: 16px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.course-description {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.course-details {
+    padding: 16px;
+    color: #4a5568;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+course-card.is-first {
+    /* padding-top: 10px; */
+    border: 2px solid black;
+    display: flex;
+    height: 0px;
+}
+
+course-card.is-last {
+    /* padding-top: 10px; */
+    border: 2px solid black;
+    display: flex;
+    height: 0px;
+}
+
+course-card.is-even {
+    color: #4a5568;
+}
+
+course-card.is-odd {
+    color: bisque;
+}

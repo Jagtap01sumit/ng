@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CourseCardComponent } from "../components/course-card.component";
-import { COURSE } from '../data/db-data';
+import { COURSES } from '../data/db-data';
+import { Course } from './model/course';
 
 @Component({
   selector: 'app-root',
@@ -11,8 +12,11 @@ import { COURSE } from '../data/db-data';
 })
 export class App {
   protected title = 'angular-app';
-  coreCourse = COURSE[0]
-  rxjsCourse = COURSE[1]
-  ngrxCourse = COURSE[2]
+
+  courses = [...COURSES];
+
+  onCourseSelected(course: Course) {
+    console.log("App component - card is clicked", course)
+  }
 
 }

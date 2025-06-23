@@ -1,4 +1,4 @@
-export const COURSE: any = [
+export const COURSES: any = [
     {
         id: "001",
         description: "Master JavaScript Basics",
