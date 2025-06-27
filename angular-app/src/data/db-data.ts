@@ -4,7 +4,7 @@ export const COURSES: any = [
         description: "Master JavaScript Basics",
         longDescription: "This course will take you through the fundamentals of JavaScript including ES6, functions, closures, and more to help you become a confident frontend developer.",
         url: "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
-        category: "Programming"
+        category: "beginner"
     },
     {
         id: "002",
@@ -25,13 +25,13 @@ export const COURSES: any = [
         description: "Full Stack with Node.js",
         longDescription: "Dive into backend development with Node.js, Express, MongoDB, and build full stack applications integrated with REST APIs.",
         url: "https://example.com/course/nodejs-fullstack",
-        category: "Full Stack"
+        category: "beginner"
     },
     {
         id: "005",
         description: "Advanced CSS Animations",
         longDescription: "Explore advanced CSS techniques for creating smooth and performant animations and transitions in modern web applications.",
         url: "https://example.com/course/css-animations",
-        category: "Frontend Development"
+        category: "beginner"
     }
 ];

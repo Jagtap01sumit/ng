@@ -228,3 +228,128 @@ $odd
 |`$last`  | `true` if the current item is the last in the array  |
 | `$even` |`true`for even-indexed items                          |
 |`$odd`   |`true` for odd-indexed items |
+
+### Old way using ngFor
+
+```html
+<course-card
+  *ngFor="let course of courses; index as i; first as isFirst; last as isLast; even as isEven; odd as isOdd"
+  [class.is-first]="isFirst"
+  [class.is-last]="isLast"
+  [class.is-even]="isEven"
+  [class.is-odd]="isOdd"
+  (courseSelected)="onCourseSelected($event)"
+  [course]="course"
+  [cardIndex]="i + 1"
+>
+</course-card>
+```
+
+✅ Command to Migrate to New Control Flow Syntax
+
+```
+ng generate @angular/core:control-flow
+
+```
+
+- ⚡ What This Does:
+
+  - Automatically converts:
+
+  - \*ngIf to @if
+
+  - \*ngFor to @for
+
+- \*ngSwitch to @switch
+
+- Updates your template files safely.
+
+- Leaves backups of the original files for review.
+
+### Conditional style - [ngClass]
+
+ngClass -> its only used for conditional style purpose, other its works same as 'class'
+
+through class only only passes strings but through ngClass we can pass an string, array or configuration obj
+
+#### passing array
+
+```html
+<div class="course-card" ngClass="['course-card', 'beginner']">
+  <div class="course-title">{{index}} + {{course.description}}</div>
+  <img width="300" [src]="course.url" />
+  <div class="course-description">{{course.longDescription}}</div>
+  <button (click)="onCourseViewed()">View Course</button>
+</div>
+```
+
+#### passing an Object
+
+```html
+<div class="course-card" ngClass="['course-card':true, 'beginner:true]">
+  <div class="course-title">{{index}} + {{course.description}}</div>
+  <img width="300" [src]="course.url" />
+  <div class="course-description">{{course.longDescription}}</div>
+  <button (click)="onCourseViewed()">View Course</button>
+</div>
+```
+
+#### we can also call the method which return the obj or values
+
+```html
+<div class="course-card" ngClass="cardClasses()">
+  <div class="course-title">{{index}} + {{course.description}}</div>
+  <img width="300" [src]="course.url" />
+  <div class="course-description">{{course.longDescription}}</div>
+  <button (click)="onCourseViewed()">View Course</button>
+</div>
+```
+
+```
+
+@Component({
+    selector: 'course-card',
+    templateUrl: './course-card.component.html',
+    styleUrls: ['./course-card.component.css'],
+    imports: [CommonModule],
+
+})
+
+```
+
+```ts
+//course-card.component.ts
+cardClasses() {
+        return {
+            'beginning': course.category==beginner,
+            'course-card': false
+        }
+    }
+
+```
+
+### [ngStyle]
+
+```
+//course-card.component.html
+<div class="course-card" [ngClass]="cardClasses()" [ngStyle]="cardStyles()">
+    <div class="course-title">
+        {{index}} , {{course.description}}
+    </div>
+    <img width="300" [src]="course.url">
+    <div class="course-description">{{course.longDescription}}</div>
+    <button (click)="onCourseViewed()">View Course</button>
+</div>
+
+```
+
+```
+//course-card.component.ts
+ cardStyles() {
+        return {
+            'background-image': 'url(' + this.course.url + ') '
+
+        }
+    }
+
+```
