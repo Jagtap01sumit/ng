@@ -1,4 +1,10 @@
 <main class="main">
+  <div class="demo">
+    <!-- <div>Start:{{startDate | date }}</div> -->Start:Jan 1, 2000
+    <!-- <div class="demo">{{title | lowercase}}</div> -->claangular-app
+    <!-- <div class="demo">{{price | currency}}</div> ->$9.99
+    <div class="demo">{{price | currency:'EUR'}}-></div>€9.99 -->
+  </div>
   <div class="content">
 
     @for(course of courses; track course.id; let i = $index;let first=$first; let last = $last; let even= $even; let

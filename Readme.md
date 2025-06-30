@@ -353,3 +353,46 @@ cardClasses() {
     }
 
 ```
+
+### @switch()
+
+```
+<div class="course-category">
+        @switch (course.category) {
+        @case ("beginner") {
+        <div class="category">Beginner</div>
+        }
+        @case ("Design") {
+        <div class="category">Design</div>
+        }
+        @case ("Frontend") {
+        <div class="category">Frontend</div>
+        }
+        }
+    </div>
+```
+
+## notion of angular pipes.
+
+#### So what exactly is a pipe?
+
+- A pipe is a template mechanism that we can use to transfor
+- An Angular pipe is a function you can use directly in your HTML templates to transform data before displaying it.
+
+```
+//app.html
+<div class="demo">
+    <!-- <div>Start:{{startDate | date }}</div> -->Start:Jan 1, 2000
+    <!-- <div class="demo">{{title | lowercase}}</div> -->claangular-app
+    <!-- <div class="demo">{{price | currency}}</div> ->$9.99
+    <div class="demo">{{price | currency:'EUR'}}-></div>€9.99 -->
+  </div>
+```
+
+```
+//app.ts
+ startDate = new Date(2000, 0, 1);
+  title = COURSES[0].description;
+  price = 9.992442224242
+  rate = 0.67
+```

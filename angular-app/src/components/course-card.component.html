@@ -3,6 +3,22 @@
         {{index}} , {{course.description}}
     </div>
     <img width="300" [src]="course.url">
+    <div class="course-category">
+        @switch (course.category) {
+        @case ("beginner") {
+        <div class="category">Beginner</div>
+        }
+        @case ("Design") {
+        <div class="category">Design</div>
+        }
+        @case ("Frontend") {
+        <div class="category">Frontend</div>
+        }
+        @default {
+        <div class="category">Unknown</div>
+        }
+        }
+    </div>
     <div class="course-description">{{course.longDescription}}</div>
     <button (click)="onCourseViewed()">View Course</button>
 </div>
