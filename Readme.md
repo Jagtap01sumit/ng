@@ -396,3 +396,148 @@ cardClasses() {
   price = 9.992442224242
   rate = 0.67
 ```
+
+## Accessing Child Component
+
+- In the `App` component, we use Angular's `@ViewChild` decorator to get a **reference to a child component instance**, specifically `CourseCardComponent`.
+
+```ts
+@ViewChild(CourseCardComponent)
+card!: CourseCardComponent;
+```
+
+-✅ What This Means
+
+- The card variable holds a reference to the first instance of CourseCardComponent found in the component's template after the view is initialized.
+
+- This allows the parent component (App) to directly access public properties and methods of the CourseCardComponent.
+
+- It provides a way to programmatically control or retrieve data from the child component.
+
+## 📦 ViewChild Query Mechanism (Angular)
+
+In this example, we are using Angular's `@ViewChild` decorator to get a reference to a DOM element from our component class.
+
+---
+
+### 🔧 How it works
+
+#### ✅ In the HTML template:
+
+```html
+<div class="courses" #container>
+  <course-card
+    class="cardcomp"
+    #cardRef1
+    (courseSelected)="onCourseSelected($event)"
+    [course]="courses[0]"
+  />
+</div>
+```
+
+#### The #container is a template reference variable, which marks this <div> so we can access it in the TypeScript file.
+
+#### #cardRef1 is a template reference variable, pointing to the course-card component.
+
+- To access the underlying DOM element of this custom component, we use { read: ElementRef } in the TypeScript file.
+
+```ts
+
+//app.ts
+@ViewChild('container')
+containerDiv!: ElementRef;
+
+
+onCourseSelected(course: Course) {
+  console.log("container div", this.containerDiv);
+}
+
+
+
+```
+
+- The @ViewChild('container') tells Angular to find the element with reference #container and give us access to it via containerDiv.
+
+- ElementRef is a wrapper around the actual DOM element, allowing us to read or manipulate it.
+- This method is triggered when the courseSelected event is emitted from the course-card component.
+
+- Inside this method, we can access the containerDiv, which gives us control over the actual <div> element in the DOM.
+
+```ts
+
+@ViewChild('cardRef1', { read: ElementRef })
+card1!: ElementRef;
+
+
+  onCourseSelected(course: Course) {
+    console.log("container div", this.card1)
+  }
+```
+
+- The { read: ElementRef } tells Angular:
+
+  - Don't give me the component instance, give me the raw DOM element instead.
+
+  - This is helpful when you want to manipulate or inspect the DOM element of a custom component, like course-card.
+
+---
+
+---
+
+# ngViewInit
+
+- ngAfterViewInit is same like constructor just its execute after main constructor?
+  - ngAfterViewInit is not the same as the constructor—they serve different purposes and run at different times in the Angular component lifecycle.
+
+## ✅ Difference between `constructor` and `ngAfterViewInit`
+
+| **Aspect**       | **constructor**                       | **ngAfterViewInit**                                                 |
+| ---------------- | ------------------------------------- | ------------------------------------------------------------------- |
+| **When it runs** | As soon as the class is instantiated. | After the component's view (and child views) are fully initialized. |
+
+## ✅ What does "After the component's view (and child views) are fully initialized" mean?
+
+In Angular:
+
+- Your component may have its own template (HTML structure).
+- Inside your template, you can have **child components** or other HTML elements.
+- These child components also have their own templates.
+
+---
+
+### 🧩 Example:
+
+```html
+<!-- app.component.html -->
+<div>
+  <h1>My Courses</h1>
+
+  <course-card #cardRef1 [course]="courses[0]"></course-card>
+</div>
+```
+
+- In this case:
+
+  - The <div> and <h1> are part of your component's view.
+
+  - The <course-card> is a child component, and it has its own view/template internally.
+
+⏳ When ngAfterViewInit runs:
+
+- Angular has finished:
+
+- Rendering your component's own HTML.
+
+- Creating and inserting all child components (like <course-card>).
+
+- Rendering the child components' templates as well.
+
+✅ Only after all this, Angular calls ngAfterViewInit.
+
+- In ngAfterViewInit, you are guaranteed that:
+
+- The DOM is ready.
+
+- All child components are created and visible.
+
+- You can safely access or modify them.

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CourseCardComponent } from "../components/course-card.component";
 import { COURSES } from '../data/db-data';
@@ -13,15 +13,23 @@ import { CommonModule } from '@angular/common';
 })
 export class App {
 
+  courses = COURSES;
 
-  courses = [...COURSES];
+  @ViewChild(CourseCardComponent)
+  car!: CourseCardComponent;
 
-  startDate = new Date(2000, 0, 1);
-  title = COURSES[0].description;
-  price = 9.992442224242
-  rate = 0.67
+
+
+  @ViewChild('cardRef1', { read: ElementRef })
+  card1!: ElementRef
+
+
+  @ViewChild('container')
+  containerDiv!: ElementRef
+
+
   onCourseSelected(course: Course) {
-    console.log("App component - card is clicked", course)
+    console.log("container div", this.card1)
   }
 
 }
