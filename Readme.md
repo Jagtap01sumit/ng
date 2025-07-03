@@ -541,3 +541,90 @@ In Angular:
 - All child components are created and visible.
 
 - You can safely access or modify them.
+
+ng
+
+## ViewChildren Decorator
+
+```ts
+
+//app.ts
+
+@ViewChildren(CoursCardComponent)
+cards: QueryList<CourseCardComponent>;
+
+
+ngAfterViewInit(){
+
+//first card of the list
+this.cards(this.cards.first)
+
+//last card of the list
+this.cards(this.cards.last)
+
+
+this.cards(this.cards.first)
+
+```
+
+# Understanding `@ViewChildren` in Angular
+
+This guide explains the difference between two common usages of Angular's `@ViewChildren` decorator:
+
+- 1. `@ViewChildren(CourseCardComponent)`
+- 2. `@ViewChildren(CourseCardComponent, { read: ElementRef })`
+
+---
+
+## 1. `@ViewChildren(CourseCardComponent)`
+
+### ✅ What it returns:
+
+A `QueryList` of **component instances** of `CourseCardComponent`.
+
+### ✅ Access type:
+
+You can interact with the **logic** of the component — call methods, access properties, etc.
+
+### ❌ You do NOT get:
+
+Direct access to the HTML element.
+
+### 🔧 Example:
+
+```ts
+@ViewChildren(CourseCardComponent) cards!: QueryList<CourseCardComponent>;
+
+ngAfterViewInit() {
+  this.cards.forEach(card => card.toggleHighlight());
+}
+
+## 2. `@ViewChildren(CourseCardComponent, { read: ElementRef })`
+
+### ✅ What it returns:
+A `QueryList` of `ElementRef` instances, each pointing to the native DOM element of the `CourseCardComponent`.
+
+### ✅ Access type:
+You can manipulate the HTML directly — styles, classes, attributes.
+
+### ❌ You do NOT get:
+Access to the component's methods or properties.
+
+
+
+---
+
+## 🔍 Comparison Table
+
+| Feature                     | `@ViewChildren(CourseCardComponent)`         | `@ViewChildren(CourseCardComponent, { read: ElementRef })` |
+|-----------------------------|----------------------------------------------|-------------------------------------------------------------|
+| **Returns**                 | Component instances                          | DOM element references (`ElementRef`)                       |
+| **Access**                  | Component logic (methods, properties)        | HTML element (styles, attributes)                           |
+| **Can call methods?**       | ✅ Yes                                       | ❌ No                                                        |
+| **Can change styles directly?** | ❌ No                                  | ✅ Yes                                                       |
+| **Use case**                | Interact with Angular component              | Manipulate DOM directly                                     |
+
+---
+---
+
+```
