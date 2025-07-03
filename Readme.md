@@ -598,7 +598,7 @@ Direct access to the HTML element.
 ngAfterViewInit() {
   this.cards.forEach(card => card.toggleHighlight());
 }
-
+```
 ## 2. `@ViewChildren(CourseCardComponent, { read: ElementRef })`
 
 ### ✅ What it returns:
@@ -627,4 +627,3 @@ Access to the component's methods or properties.
 ---
 ---
 
-```
