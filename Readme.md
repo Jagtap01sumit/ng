@@ -717,15 +717,19 @@ When you try to use `@ViewChild()` to access a template reference inside project
   <img #courseImage src="..." />
 </course-card>
 
-// Inside CourseCardComponent @ViewChild('courseImage') image: ElementRef;
+````
+// Inside CourseCardComponent 
+
+```@ViewChild('courseImage') image: ElementRef;
 ngAfterViewInit() { console.log(this.image); // ❌ undefined } This fails
-because courseImage is not part of the view, it's projected content. ### To
-access projected content, use @ContentChild() instead. ```ts // Inside
+because courseImage is not part of the view, it's projected content.
+```
+### To access projected content, use @ContentChild() instead. 
+```ts // Inside
 CourseCardComponent @ContentChild('courseImage') image: ElementRef;
 ngAfterContentInit() { console.log(this.image); // ✅ ElementRef of the
 projected image }
-````
-
+```
 - The scope of @ContentChild() is limited to content projected via <ng-content>.
 - It cannot access elements that are outside of the <ng-content> projection area.
 
