@@ -1,13 +1,14 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ContentChildren, ElementRef, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CourseCardComponent } from "../components/course-card.component";
+import { CourseCardComponent } from "../components/course-card/course-card.component";
 import { COURSES } from '../data/db-data';
 import { Course } from './model/course';
 import { CommonModule } from '@angular/common';
+import { CourseImage } from "../components/course-image/course-image";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CourseCardComponent, CommonModule],
+  imports: [RouterOutlet, CourseCardComponent, CommonModule, CourseImage],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
