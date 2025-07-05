@@ -1,7 +1,15 @@
-<div class="courses" #container>
+<div class="courses" #container *ngIf="courses[0] as course">
 
 
-  <course-card class="cardcomp" #cardRef1 (courseSelected)="onCourseSelected($event)" [course]="courses[0]" />
+  <course-card class="cardcomp" #cardRef1 (courseSelected)="onCourseSelected($event)" [course]="course">
+    <app-course-image [img]="course.url"></app-course-image>
+    <app-course-image [img]="courses[1].url"></app-course-image>
+    <app-course-image [img]="courses[2].url"></app-course-image>
+
+
+
+  </course-card>
+
 
 
 </div>

@@ -2,7 +2,7 @@
     <div class="course-title">
         {{index}} , {{course.description}}
     </div>
-    <img width="300" [src]="course.url">
+    <ng-content></ng-content>
     <div class="course-category">
         @switch (course.category) {
         @case ("beginner") {

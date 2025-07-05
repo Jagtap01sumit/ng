@@ -599,31 +599,174 @@ ngAfterViewInit() {
   this.cards.forEach(card => card.toggleHighlight());
 }
 ```
+
 ## 2. `@ViewChildren(CourseCardComponent, { read: ElementRef })`
 
 ### ✅ What it returns:
+
 A `QueryList` of `ElementRef` instances, each pointing to the native DOM element of the `CourseCardComponent`.
 
 ### ✅ Access type:
+
 You can manipulate the HTML directly — styles, classes, attributes.
 
 ### ❌ You do NOT get:
+
 Access to the component's methods or properties.
-
-
 
 ---
 
 ## 🔍 Comparison Table
 
-| Feature                     | `@ViewChildren(CourseCardComponent)`         | `@ViewChildren(CourseCardComponent, { read: ElementRef })` |
-|-----------------------------|----------------------------------------------|-------------------------------------------------------------|
-| **Returns**                 | Component instances                          | DOM element references (`ElementRef`)                       |
-| **Access**                  | Component logic (methods, properties)        | HTML element (styles, attributes)                           |
-| **Can call methods?**       | ✅ Yes                                       | ❌ No                                                        |
-| **Can change styles directly?** | ❌ No                                  | ✅ Yes                                                       |
-| **Use case**                | Interact with Angular component              | Manipulate DOM directly                                     |
+| Feature                         | `@ViewChildren(CourseCardComponent)`  | `@ViewChildren(CourseCardComponent, { read: ElementRef })` |
+| ------------------------------- | ------------------------------------- | ---------------------------------------------------------- |
+| **Returns**                     | Component instances                   | DOM element references (`ElementRef`)                      |
+| **Access**                      | Component logic (methods, properties) | HTML element (styles, attributes)                          |
+| **Can call methods?**           | ✅ Yes                                | ❌ No                                                      |
+| **Can change styles directly?** | ❌ No                                 | ✅ Yes                                                     |
+| **Use case**                    | Interact with Angular component       | Manipulate DOM directly                                    |
 
 ---
+
 ---
 
+# Content Projection with `ng-content`
+
+## 🧩 What is Content Projection?
+
+Content projection allows you to **pass content from a parent component into a child component** and display it at a specific location inside the child using the `<ng-content>` directive.
+
+This is useful when you want the child component to be flexible and allow the parent to control part of its layout or content.
+
+---
+
+## 🎯 Scenario
+
+We have a `CourseCardComponent` that used to render an `<img>` tag internally. Now, we want the **parent component** to control what image is shown for each card, so we **moved the `<img>` tag to the parent** and used `<ng-content>` in the child to project it.
+
+---
+
+## 🧱 Parent Component Template (`app.component.html`)
+
+```html
+<div class="courses" *ngIf="courses[0] as course">
+  <course-card (courseSelected)="onCourseSelected($event)" [course]="course">
+    <img width="300" alt="Angular Logo" [src]="course.iconUrl" />
+    <div class="course-container">
+      <h2>content in course card</h2>
+    </div>
+    <h5>total Lessons: 10</h5>
+  </course-card>
+</div>
+```
+
+- Here, the <img> and <h5> elements are placed between the opening and closing tags of <course-card>. These elements are not part of the child component's template directly, but will be projected into it using <ng-content>.
+
+```html
+<div class="course-card" [ngClass]="cardClasses()" [ngStyle]="cardStyles()">
+  <div class="course-title">{{index}}, {{course.description}}</div>
+
+  <!-- Content from parent will be inserted here -->
+
+  <ng-content></ng-content>
+  <!-- This project any type of content which between opening and closing tag of child component in parents-->
+  //<ng-content select="img"></ng-content>
+
+  <!-- Only <img> tags from the parent will be projected here -->
+  //<ng-content select=".course-container"></ng-content>
+  <!-- This projects only element or content btn the ".course-container" class div-->
+
+  //<ng-content select=".course-container"></ng-content>
+  <!-- Only elements with the class 'course-container' will be projected here -->
+
+  <div class="course-description">{{course.longDescription}}</div>
+  <button (click)="onCourseViewed()">View Course</button>
+</div>
+```
+
+- The <ng-content> tag acts as a placeholder for the content passed from the parent. In this case, the <img> and <h5> from the parent will be rendered inside the child component at the location of <ng-content>.
+
+- You can also use **selectors** to control **where specific types of content** should be projected. ex. img, class, id
+
+- Key Points
+- <ng-content> enables content projection from parent to child.
+- Useful for creating reusable and flexible components.
+- The parent controls what content is projected.
+- The child defines where the projected content should appear.
+
+# Angular `@ContentChild()` Decorator
+
+## 🧩 What is `@ContentChild()`?
+
+In Angular, `@ViewChild()` is used to access elements **inside the component's own template**.  
+However, when you use **content projection** via `<ng-content>`, the projected content is **not part of the component's view**, so `@ViewChild()` **cannot access it**.
+
+To access projected content, Angular provides the `@ContentChild()` decorator.
+
+---
+
+## 🆚 Why `@ViewChild()` Doesn't Work with `<ng-content>`
+
+When you try to use `@ViewChild()` to access a template reference inside projected content, it returns `undefined`.
+
+### ❌ Example (Fails):
+
+````html
+<!-- Parent Component -->
+<course-card>
+  <img #courseImage src="..." />
+</course-card>
+
+// Inside CourseCardComponent @ViewChild('courseImage') image: ElementRef;
+ngAfterViewInit() { console.log(this.image); // ❌ undefined } This fails
+because courseImage is not part of the view, it's projected content. ### To
+access projected content, use @ContentChild() instead. ```ts // Inside
+CourseCardComponent @ContentChild('courseImage') image: ElementRef;
+ngAfterContentInit() { console.log(this.image); // ✅ ElementRef of the
+projected image }
+````
+
+- The scope of @ContentChild() is limited to content projected via <ng-content>.
+- It cannot access elements that are outside of the <ng-content> projection area.
+
+## @ContentChildren()
+
+- @ContentChildren works similar to @ContentChild()
+
+```html
+<div class="courses" #container *ngIf="courses[0] as course">
+  <course-card
+    class="cardcomp"
+    #cardRef1
+    (courseSelected)="onCourseSelected($event)"
+    [course]="course"
+  >
+    <app-course-image [img]="course.url"></app-course-image>
+    <app-course-image [img]="courses[1].url"></app-course-image>
+    <app-course-image [img]="courses[2].url"></app-course-image>
+  </course-card>
+</div>
+```
+
+```ts
+//course-card.component.ts
+
+    @ContentChildren(CourseImage, { read: ElementRef })
+    images!: QueryList<ElementRef>;
+
+    ngAfterContentInit(): void {
+        console.log("images QueryList:", this.images);
+        console.log("First image ElementRef:", this.images.first);
+    }
+```
+
+🚀 Key Points
+
+- ✔ @ContentChildren is used to access multiple projected children.
+- ✔ It requires <ng-content> inside your component's template.
+- ✔ The read: ElementRef option gives direct access to the native DOM elements.
+- ✔ Useful for manipulating, styling, or interacting with projected content.
+
+---
+
+---

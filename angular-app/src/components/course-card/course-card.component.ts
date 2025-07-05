@@ -1,7 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { COURSES } from "../data/db-data";
-import { Course } from "../app/model/course";
+import { AfterContentInit, AfterViewInit, Component, ContentChildren, ElementRef, EventEmitter, Input, OnInit, Output, QueryList } from "@angular/core";
+import { COURSES } from "../../data/db-data";
+
 import { CommonModule } from "@angular/common";
+import { Course } from "../../app/model/course";
+import { CourseImage } from "../course-image/course-image";
 
 @Component({
     selector: 'course-card',
@@ -11,7 +13,7 @@ import { CommonModule } from "@angular/common";
 
 })
 
-export class CourseCardComponent implements OnInit {
+export class CourseCardComponent implements OnInit, AfterViewInit, AfterContentInit {
 
     @Input({
         required: true
@@ -24,11 +26,23 @@ export class CourseCardComponent implements OnInit {
     @Output('courseSelected')
     eventEmitter = new EventEmitter<Course>();
 
+    @ContentChildren(CourseImage, { read: ElementRef })
+    images!: QueryList<ElementRef>;
+
+
     onCourseViewed() {
         console.log("card component - button clicked")
         this.eventEmitter.emit(this.course);
     }
+    ngAfterContentInit(): void {
+        console.log("images QueryList:", this.images);
+        console.log("First image ElementRef:", this.images.first);
+    }
 
+
+    ngAfterViewInit(): void {
+
+    }
     constructor() { }
     ngOnInit(): void {
 
