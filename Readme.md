@@ -1,4 +1,4 @@
-# Angular Setup
+### Angular Setup
 
 ```
 npm install -g @angular/cli
@@ -19,13 +19,13 @@ This example demonstrates how to pass data from a parent component (`AppComponen
 
 ---
 
-## 🔧 Goal
+### 🔧 Goal
 
 Render multiple course cards dynamically by passing course data (`Course` object) from the parent to each `<course-card>` component. This setup showcases clean **parent-to-child communication** in Angular.
 
 ---
 
-## 🔁 What is Happening Here?
+### 🔁 What is Happening Here?
 
 - **`AppComponent`** (the **parent**) contains course data.
 - It passes this data down to **`CourseCardComponent`** (the **child**) using `[course]="..."`.
@@ -598,7 +598,7 @@ Direct access to the HTML element.
 ngAfterViewInit() {
   this.cards.forEach(card => card.toggleHighlight());
 }
-
+```
 ## 2. `@ViewChildren(CourseCardComponent, { read: ElementRef })`
 
 ### ✅ What it returns:
@@ -627,4 +627,3 @@ Access to the component's methods or properties.
 ---
 ---
 
-```
