@@ -770,3 +770,63 @@ projected image }
 ---
 
 ---
+
+# Angular template (ng-template)
+
+```html
+<ng-template #blackImage>
+  <p class="warm">No Image Found</p>
+</ng-template>
+
+<ng-container *ngIf="course.url; else blackImage">
+  <ng-content select="app-course-image"></ng-content>
+</ng-container>
+```
+
+- ng-template #blackImage:
+  - Defines a hidden block of HTML that only gets displayed if we explicitly render it.
+  - In this case, it shows "No Image Found" as a fallback if the course image is missing.
+
+🔑 Important Notes:
+
+- Although ng-template is hidden by default, it can access variables like course from the surrounding template where it's declared.
+
+- You can also define private variables inside ng-template, visible only inside that template, by using Angular's template variable syntax if needed.
+
+- You cannot apply \*ngIf directly to <ng-content>. That's why we wrap it with ng-container, which doesn't add extra DOM but allows structural directives.
+
+### What is Template Initiation in Angular?
+
+**Template Initiation** means creating and preparing reusable templates in your Angular component that can be displayed (or not) based on certain conditions.
+
+In Angular, we use `ng-template` to define these templates. They don't get rendered immediately. Instead, we can "initiate" or show them later in the code using `ngTemplateOutlet`.
+
+---
+
+#### Example of Template Initiation:
+
+```html
+<ng-template #blackImage let-courseName="description">
+  <p class="warm">{{courseName}} - No Image Found</p>
+</ng-template>
+
+<ng-container
+  *ngTemplateOutlet="blackImage; context: { description: course.description }"
+></ng-container>
+```
+
+- What is let-courseName="description" in Angular?
+- This is part of Angular's template variable binding inside an <ng-template>.
+
+- description is a property passed through context in ngTemplateOutlet.
+
+- let-courseName="description" means:
+
+  - "Create a local variable named courseName and bind it to the value of description."
+
+- We do this so that the template can be reusable and dynamic. You can pass different values every time you use the template.
+
+```
+<ng-container *ngTemplateOutlet="blackImage; context: { description: course.description }"></ng-container>
+
+```

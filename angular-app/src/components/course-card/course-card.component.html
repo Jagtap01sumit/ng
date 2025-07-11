@@ -2,7 +2,16 @@
     <div class="course-title">
         {{index}} , {{course.description}}
     </div>
-    <ng-content></ng-content>
+
+
+    <ng-container *ngIf="course.url; else noImage ">
+        <ng-content select="app-course-image"></ng-content>
+    </ng-container>
+    <ng-template #noImage>
+        <ng-container *ngTemplateOutlet="noImageTpl; context: { description: course.description }">
+
+        </ng-container>
+    </ng-template>
     <div class="course-category">
         @switch (course.category) {
         @case ("beginner") {
