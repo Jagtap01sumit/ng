@@ -830,3 +830,26 @@ In Angular, we use `ng-template` to define these templates. They don't get rende
 <ng-container *ngTemplateOutlet="blackImage; context: { description: course.description }"></ng-container>
 
 ```
+
+---
+
+---
+
+## Angular Attribute directives
+
+-The directives which apply on a element and change the behaviour of the element is callsed attibute directives
+
+example
+
+```
+<input disable required></input>
+
+```
+
+### how we can create custom directives
+
+```
+ng g directive directives/highlighted
+```
+
+-

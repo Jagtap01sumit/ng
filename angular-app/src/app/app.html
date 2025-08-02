@@ -1,20 +1,9 @@
 <div class="courses" #container *ngIf="courses[0] as course">
-  <ng-template #blackImage let-courseName="description">
-    <p class="warm">{{courseName}} - No Image Found</p>
-  </ng-template>
-  <!-- <ng-container *ngTemplateOutlet="blackImage; context: { description: course.description }"></ng-container> -->
+  <div highlighted>
+    <course-card highlighted class="cardcomp" [course]="course"></course-card>
+  </div>
+  <course-card highlighted class=" cardcomp" [course]="courses[2]"></course-card>
 
-
-  <course-card class="cardcomp" #cardRef1 (courseSelected)="onCourseSelected($event)" [course]="course"
-    [noImageTpl]="blackImage">
-    <app-course-image [img]="course.url"></app-course-image>
-    <!-- <app-course-image [img]="courses[1].url"></app-course-image>
-    <app-course-image [img]="courses[2].url"></app-course-image> -->
-
-
-
-  </course-card>
-
-
+  <div>hello</div>
 
 </div>
