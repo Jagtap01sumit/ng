@@ -1,9 +1,8 @@
 <div class="courses" #container *ngIf="courses[0] as course">
-  <div highlighted>
-    <course-card highlighted class="cardcomp" [course]="course"></course-card>
+  <div>
+    <course-card class="cardcomp" [course]="course"></course-card>
   </div>
-  <course-card highlighted class=" cardcomp" [course]="courses[2]"></course-card>
-
-  <div>hello</div>
+  <course-card class=" cardcomp" [course]="courses[2]"></course-card>
+  <div [appActive]="true">hello</div>
 
 </div>

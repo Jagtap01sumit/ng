@@ -1,20 +1,23 @@
-import { AfterContentInit, AfterViewInit, Component, ContentChildren, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, TemplateRef } from "@angular/core";
+import { AfterContentInit, AfterViewInit, Component, ContentChildren, ElementRef, EventEmitter, Input, NgModule, OnInit, Output, QueryList, TemplateRef } from "@angular/core";
 import { COURSES } from "../../data/db-data";
+
 
 import { CommonModule } from "@angular/common";
 import { Course } from "../../app/model/course";
 import { CourseImage } from "../course-image/course-image";
 // import { ɵEmptyOutletComponent } from "../../../node_modules/@angular/router/router_module.d-mlGavL8F";
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { HighlightedDirective } from "../../app/directives/highlighted";
 // import { ɵEmptyOutletComponent } from "../../../node_modules/@angular/router/router_module.d-mlGavL8F";
 
 @Component({
     selector: 'course-card',
     templateUrl: './course-card.component.html',
     styleUrls: ['./course-card.component.css'],
-    imports: [CommonModule],
-
+    imports: [CommonModule, HighlightedDirective],
+   
 })
+
 
 export class CourseCardComponent implements OnInit, AfterViewInit, AfterContentInit {
 

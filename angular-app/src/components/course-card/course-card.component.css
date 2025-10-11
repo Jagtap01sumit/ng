@@ -52,3 +52,10 @@
 .beggining {
     background-color: aqua;
 }
+
+.highlighted {
+    background-color: yellow;
+    border: 2px solid orange;
+    transition: 0.3s ease-in-out;
+
+}

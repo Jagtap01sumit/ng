@@ -795,6 +795,9 @@ projected image }
 
 - You cannot apply \*ngIf directly to <ng-content>. That's why we wrap it with ng-container, which doesn't add extra DOM but allows structural directives.
 
+- \*ngIf → Angular automatically wraps the element in a <ng-template> for you. You just write the div (or any element) and Angular handles the template behind the scenes.
+- -[ngIf] → You must explicitly write the <ng-template> yourself. Angular won’t wrap the element
+
 ### What is Template Initiation in Angular?
 
 **Template Initiation** means creating and preparing reusable templates in your Angular component that can be displayed (or not) based on certain conditions.
@@ -835,16 +838,17 @@ In Angular, we use `ng-template` to define these templates. They don't get rende
 
 ---
 
-## Angular Attribute directives
+## Directives in Angular
 
--The directives which apply on a element and change the behaviour of the element is callsed attibute directives
+- In Angular, Directives are special instructions that you attach to elements in the DOM to change their behavior or appearance.
 
-example
+- There are 3 types:
 
-```
-<input disable required></input>
+  - Component Directives → basically Angular components (@Component).
 
-```
+  - Structural Directives → change DOM structure (*ngIf, *ngFor).
+
+  - Attribute Directives → change appearance/behavior (ngClass, custom directives).
 
 ### how we can create custom directives
 
@@ -853,3 +857,216 @@ ng g directive directives/highlighted
 ```
 
 -
+
+### Angular Attribute directives
+
+-The directives which apply on a element and change the behaviour of the element is called attibute directives
+
+example
+
+```
+<input disable required></input>
+
+```
+
+..
+
+- Examples:
+
+  - Built-in → ngClass, ngStyle
+
+  - Custom → directives you build with @Directive
+
+- Inside attribute directives, we use:
+
+  - @HostBinding → to bind properties/classes/styles of the host element.
+
+  - @HostListener → to listen to events on the host element.
+
+#### Highlight.directive.ts
+
+```
+import { Directive, HostBinding, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[highlighted]' // usage as attribute
+})
+export class HighlightDirective {
+  private isActive = false;
+
+  // Dynamically bind a CSS class to the host element
+  @HostBinding('class.highlighted') get applyClass() {
+    return this.isActive;
+  }
+
+  // Toggle class on click
+  @HostListener('click') toggle() {
+    this.isActive = !this.isActive;
+  }
+}
+
+```
+
+### course-card.component.html
+
+```
+<div highlighted>
+  Click me → I toggle "highlighted" class
+</div>
+```
+
+### other example with all file structure
+
+```
+
+//app/directives/active.directive.ts
+
+import { Directive, HostBinding, HostListener, Input } from '@angular/core';
+
+@Directive({
+    selector: '[appActive]'
+})
+export class ActiveDirective {
+    @Input('appActive') isActive = false;
+
+    @HostBinding('class.active') get cssClass() { return this.isActive; }
+
+    @HostListener('mouseover') mouseOver() { this.isActive = true; }
+    @HostListener('mouseleave') mouseLeave() { this.isActive = false; }
+
+    toggle() { this.isActive = !this.isActive; }
+}
+
+//app/app.ts
+//add in imports (ActiveDirective)
+ imports: [RouterOutlet, CourseCardComponent, CommonModule, CourseImage, HighlightedDirective, ActiveDirective],
+
+
+//app.html
+
+<div class="courses" #container *ngIf="courses[0] as course">
+  <div>
+    <course-card class="cardcomp" [course]="course"></course-card>
+  </div>
+  <course-card class=" cardcomp" [course]="courses[2]"></course-card>
+  <div [appActive]="true">hello</div>//here we use
+
+</div>
+```
+
+#### How we can acheive the same behaviour in react
+
+```
+import { useState } from "react";
+
+function HighlightedBox({ children }) {
+  const [isActive, setIsActive] = useState(false);
+
+  return (
+    <div
+      className={isActive ? "highlighted" : ""}
+      onClick={() => setIsActive(!isActive)}
+    >
+      {children}
+    </div>
+  );
+}
+```
+
+
+### Structural directives step by step implementation
+#### Creating Custom Structural Directives in Angular
+- In Angular, Structural Directives are used to add or remove elements from the DOM dynamically.
+- They are identified by the * symbol (like *ngIf, *ngFor, etc.).
+
+##### You can also create your own structural directives to implement custom logic — such as conditionally displaying elements based on user roles, data, or application state.
+
+#### What is a Structural Directive?
+- A structural directive changes the structure of the DOM.
+- ex. *ngIf it will add or remove the div element based on condition
+
+#### Step-by-Step Implementation
+
+- Create the Directive File
+```
+ng generate directive pnxUnless
+
+```
+
+- Implement the Directive Logic
+```
+import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+
+@Directive({
+  selector: '[pnxUnless]'
+})
+export class PnxUnlessDirective {
+
+  private visible = false;
+
+  constructor(
+    private templateRef: TemplateRef<any>,      // Reference to the <ng-template> content
+    private viewContainer: ViewContainerRef     // Placeholder to insert/remove template
+  ) {}
+
+  @Input() set pnxUnless(condition: boolean) {
+    if (!condition && !this.visible) {
+      // Condition is false → show the element
+      this.viewContainer.createEmbeddedView(this.templateRef);
+      this.visible = true;
+    } else if (condition && this.visible) {
+      // Condition is true → remove the element
+      this.viewContainer.clear();
+      this.visible = false;
+    }
+  }
+}
+
+```
+- Use It in Your Component Template
+```
+  <h2>Example: Custom Structural Directive</h2>
+```
+```
+<input
+ type="checkbox" [(ngModel)]="isHidden"> Toggle Hide
+```
+```
+<div *pnxUnless="isHidden" class="card">
+  This text is visible unless the checkbox is checked.
+</div>
+
+  ```
+#### How It Works Internally
+
+When Angular sees:
+
+<div *pnxUnless="isHidden"></div>
+
+
+- It actually converts it to:
+
+<ng-template [pnxUnless]="isHidden">
+  <div></div>
+</ng-template>
+
+
+- Then your directive:
+
+Gets a reference to that template using TemplateRef.
+
+Decides (based on the condition) whether to:
+
+Insert the template using viewContainer.createEmbeddedView(templateRef)
+
+Remove it using viewContainer.clear()
+
+| Concept                  | Description                                             |
+| ------------------------ | ------------------------------------------------------- |
+| **Structural Directive** | Changes DOM structure (adds/removes elements)           |
+| **TemplateRef**          | Reference to the HTML template (hidden `<ng-template>`) |
+| **ViewContainerRef**     | Manages where to insert/remove the template             |
+| **@Input() Setter**      | Receives condition dynamically                          |
+| **createEmbeddedView()** | Displays the template                                   |
+| **clear()**              | Removes the template                                    |
+
