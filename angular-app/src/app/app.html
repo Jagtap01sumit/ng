@@ -1,15 +1,8 @@
 <div class="courses" #container *ngIf="courses[0] as course">
-
-
-  <course-card class="cardcomp" #cardRef1 (courseSelected)="onCourseSelected($event)" [course]="course">
-    <app-course-image [img]="course.url"></app-course-image>
-    <app-course-image [img]="courses[1].url"></app-course-image>
-    <app-course-image [img]="courses[2].url"></app-course-image>
-
-
-
-  </course-card>
-
-
+  <div>
+    <course-card class="cardcomp" [course]="course"></course-card>
+  </div>
+  <course-card class=" cardcomp" [course]="courses[2]"></course-card>
+  <div [appActive]="true">hello</div>
 
 </div>

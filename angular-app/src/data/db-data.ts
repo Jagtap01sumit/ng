@@ -3,7 +3,7 @@ export const COURSES: any = [
         id: "001",
         description: "Master JavaScript Basics",
         longDescription: "This course will take you through the fundamentals of JavaScript including ES6, functions, closures, and more to help you become a confident frontend developer.",
-        url: "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+        // url: "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
         category: "beginner"
     },
     {

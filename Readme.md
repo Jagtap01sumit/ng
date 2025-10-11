@@ -774,3 +774,303 @@ projected image }
 ---
 
 ---
+
+# Angular template (ng-template)
+
+```html
+<ng-template #blackImage>
+  <p class="warm">No Image Found</p>
+</ng-template>
+
+<ng-container *ngIf="course.url; else blackImage">
+  <ng-content select="app-course-image"></ng-content>
+</ng-container>
+```
+
+- ng-template #blackImage:
+  - Defines a hidden block of HTML that only gets displayed if we explicitly render it.
+  - In this case, it shows "No Image Found" as a fallback if the course image is missing.
+
+🔑 Important Notes:
+
+- Although ng-template is hidden by default, it can access variables like course from the surrounding template where it's declared.
+
+- You can also define private variables inside ng-template, visible only inside that template, by using Angular's template variable syntax if needed.
+
+- You cannot apply \*ngIf directly to <ng-content>. That's why we wrap it with ng-container, which doesn't add extra DOM but allows structural directives.
+
+- \*ngIf → Angular automatically wraps the element in a <ng-template> for you. You just write the div (or any element) and Angular handles the template behind the scenes.
+- -[ngIf] → You must explicitly write the <ng-template> yourself. Angular won’t wrap the element
+
+### What is Template Initiation in Angular?
+
+**Template Initiation** means creating and preparing reusable templates in your Angular component that can be displayed (or not) based on certain conditions.
+
+In Angular, we use `ng-template` to define these templates. They don't get rendered immediately. Instead, we can "initiate" or show them later in the code using `ngTemplateOutlet`.
+
+---
+
+#### Example of Template Initiation:
+
+```html
+<ng-template #blackImage let-courseName="description">
+  <p class="warm">{{courseName}} - No Image Found</p>
+</ng-template>
+
+<ng-container
+  *ngTemplateOutlet="blackImage; context: { description: course.description }"
+></ng-container>
+```
+
+- What is let-courseName="description" in Angular?
+- This is part of Angular's template variable binding inside an <ng-template>.
+
+- description is a property passed through context in ngTemplateOutlet.
+
+- let-courseName="description" means:
+
+  - "Create a local variable named courseName and bind it to the value of description."
+
+- We do this so that the template can be reusable and dynamic. You can pass different values every time you use the template.
+
+```
+<ng-container *ngTemplateOutlet="blackImage; context: { description: course.description }"></ng-container>
+
+```
+
+---
+
+---
+
+## Directives in Angular
+
+- In Angular, Directives are special instructions that you attach to elements in the DOM to change their behavior or appearance.
+
+- There are 3 types:
+
+  - Component Directives → basically Angular components (@Component).
+
+  - Structural Directives → change DOM structure (*ngIf, *ngFor).
+
+  - Attribute Directives → change appearance/behavior (ngClass, custom directives).
+
+### how we can create custom directives
+
+```
+ng g directive directives/highlighted
+```
+
+-
+
+### Angular Attribute directives
+
+-The directives which apply on a element and change the behaviour of the element is called attibute directives
+
+example
+
+```
+<input disable required></input>
+
+```
+
+..
+
+- Examples:
+
+  - Built-in → ngClass, ngStyle
+
+  - Custom → directives you build with @Directive
+
+- Inside attribute directives, we use:
+
+  - @HostBinding → to bind properties/classes/styles of the host element.
+
+  - @HostListener → to listen to events on the host element.
+
+#### Highlight.directive.ts
+
+```
+import { Directive, HostBinding, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[highlighted]' // usage as attribute
+})
+export class HighlightDirective {
+  private isActive = false;
+
+  // Dynamically bind a CSS class to the host element
+  @HostBinding('class.highlighted') get applyClass() {
+    return this.isActive;
+  }
+
+  // Toggle class on click
+  @HostListener('click') toggle() {
+    this.isActive = !this.isActive;
+  }
+}
+
+```
+
+### course-card.component.html
+
+```
+<div highlighted>
+  Click me → I toggle "highlighted" class
+</div>
+```
+
+### other example with all file structure
+
+```
+
+//app/directives/active.directive.ts
+
+import { Directive, HostBinding, HostListener, Input } from '@angular/core';
+
+@Directive({
+    selector: '[appActive]'
+})
+export class ActiveDirective {
+    @Input('appActive') isActive = false;
+
+    @HostBinding('class.active') get cssClass() { return this.isActive; }
+
+    @HostListener('mouseover') mouseOver() { this.isActive = true; }
+    @HostListener('mouseleave') mouseLeave() { this.isActive = false; }
+
+    toggle() { this.isActive = !this.isActive; }
+}
+
+//app/app.ts
+//add in imports (ActiveDirective)
+ imports: [RouterOutlet, CourseCardComponent, CommonModule, CourseImage, HighlightedDirective, ActiveDirective],
+
+
+//app.html
+
+<div class="courses" #container *ngIf="courses[0] as course">
+  <div>
+    <course-card class="cardcomp" [course]="course"></course-card>
+  </div>
+  <course-card class=" cardcomp" [course]="courses[2]"></course-card>
+  <div [appActive]="true">hello</div>//here we use
+
+</div>
+```
+
+#### How we can acheive the same behaviour in react
+
+```
+import { useState } from "react";
+
+function HighlightedBox({ children }) {
+  const [isActive, setIsActive] = useState(false);
+
+  return (
+    <div
+      className={isActive ? "highlighted" : ""}
+      onClick={() => setIsActive(!isActive)}
+    >
+      {children}
+    </div>
+  );
+}
+```
+
+
+### Structural directives step by step implementation
+#### Creating Custom Structural Directives in Angular
+- In Angular, Structural Directives are used to add or remove elements from the DOM dynamically.
+- They are identified by the * symbol (like *ngIf, *ngFor, etc.).
+
+##### You can also create your own structural directives to implement custom logic — such as conditionally displaying elements based on user roles, data, or application state.
+
+#### What is a Structural Directive?
+- A structural directive changes the structure of the DOM.
+- ex. *ngIf it will add or remove the div element based on condition
+
+#### Step-by-Step Implementation
+
+- Create the Directive File
+```
+ng generate directive pnxUnless
+
+```
+
+- Implement the Directive Logic
+```
+import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+
+@Directive({
+  selector: '[pnxUnless]'
+})
+export class PnxUnlessDirective {
+
+  private visible = false;
+
+  constructor(
+    private templateRef: TemplateRef<any>,      // Reference to the <ng-template> content
+    private viewContainer: ViewContainerRef     // Placeholder to insert/remove template
+  ) {}
+
+  @Input() set pnxUnless(condition: boolean) {
+    if (!condition && !this.visible) {
+      // Condition is false → show the element
+      this.viewContainer.createEmbeddedView(this.templateRef);
+      this.visible = true;
+    } else if (condition && this.visible) {
+      // Condition is true → remove the element
+      this.viewContainer.clear();
+      this.visible = false;
+    }
+  }
+}
+
+```
+- Use It in Your Component Template
+```
+  <h2>Example: Custom Structural Directive</h2>
+```
+```
+<input
+ type="checkbox" [(ngModel)]="isHidden"> Toggle Hide
+```
+```
+<div *pnxUnless="isHidden" class="card">
+  This text is visible unless the checkbox is checked.
+</div>
+
+  ```
+#### How It Works Internally
+
+When Angular sees:
+
+<div *pnxUnless="isHidden"></div>
+
+
+- It actually converts it to:
+
+<ng-template [pnxUnless]="isHidden">
+  <div></div>
+</ng-template>
+
+
+- Then your directive:
+
+Gets a reference to that template using TemplateRef.
+
+Decides (based on the condition) whether to:
+
+Insert the template using viewContainer.createEmbeddedView(templateRef)
+
+Remove it using viewContainer.clear()
+
+| Concept                  | Description                                             |
+| ------------------------ | ------------------------------------------------------- |
+| **Structural Directive** | Changes DOM structure (adds/removes elements)           |
+| **TemplateRef**          | Reference to the HTML template (hidden `<ng-template>`) |
+| **ViewContainerRef**     | Manages where to insert/remove the template             |
+| **@Input() Setter**      | Receives condition dynamically                          |
+| **createEmbeddedView()** | Displays the template                                   |
+| **clear()**              | Removes the template                                    |
+

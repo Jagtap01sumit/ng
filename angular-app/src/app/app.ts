@@ -5,10 +5,12 @@ import { COURSES } from '../data/db-data';
 import { Course } from './model/course';
 import { CommonModule } from '@angular/common';
 import { CourseImage } from "../components/course-image/course-image";
+import { HighlightedDirective } from "./directives/highlighted";
+import { ActiveDirective } from './directives/active.directive';
 
 @Component({
-  selector: 'app-root',
-  imports: [RouterOutlet, CourseCardComponent, CommonModule, CourseImage],
+  selector: 'app-root', standalone: true,
+  imports: [RouterOutlet, CourseCardComponent, CommonModule, CourseImage, HighlightedDirective, ActiveDirective],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
