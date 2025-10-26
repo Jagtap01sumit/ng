@@ -1070,3 +1070,13 @@ Remove it using viewContainer.clear()
 | **createEmbeddedView()** | Displays the template                                   |
 | **clear()**              | Removes the template                                    |
 
+## Angular View Encapsulation
+
+
+:host
+:host-context
+::ng-deep
+
+encapsulation:ViewEncapsulation.ShadowDom/None/Emulate
+
+if we apply shadowDom then only componenet css can apply for that module, no global css will apply on it
