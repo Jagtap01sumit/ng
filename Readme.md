@@ -1084,3 +1084,92 @@ Remove it using viewContainer.clear()
 encapsulation:ViewEncapsulation.ShadowDom/None/Emulate
 
 if we apply shadowDom then only componenet css can apply for that module, no global css will apply on it
+
+
+---
+---
+### Angular HTTP Client - Get call with Request parameter
+```
+export class AppComponent implements OnInit {
+
+
+  courses = COURSES;
+
+  constructor(private http: HttpClient) {
+      console.log("hellol̥");
+  }
+
+  ngOnInit() {
+    this.http.get('/api/courses')
+        .subscribe(
+          val=>console.log(val)
+        )
+  }
+
+
+
+}
+
+# The constructor is called first, when Angular creates the component instance.
+# Its job is to initialize the component and inject any dependencies you need.
+```
+##### Why HttpClient is injected:
+
+- Angular uses dependency injection (DI) to provide services like HttpClient.
+
+- You don’t create HttpClient manually; Angular provides a ready-to-use instance.
+
+- Syntax:
+
+```
+private http: HttpClient
+```
+- private automatically creates a class property http you can use in the component.
+
+- Type HttpClient tells Angular what service to inject.
+
+##### Why we don’t make API calls here:
+
+- The constructor only initializes the class, it should not contain logic that depends on Angular bindings or DOM.
+
+- Component properties like @Input() are not yet initialized in the constructor.
+
+- Therefore, API calls are deferred to ngOnInit.
+
+##### ngOnInit Lifecycle Hook
+```
+ngOnInit() {
+    this.http.get('/api/courses')
+        .subscribe(val => console.log(val));
+}
+
+```
+- It’s a lifecycle hook that Angular calls after the component is fully initialized, including input bindings.
+- Ideal place to put initialization logic that depends on Angular (e.g., API calls, DOM queries).
+- ngOnInit guarantees the component is ready.
+  
+##### HttpClient and API Calls
+```
+this.http.get('/api/courses')
+```
+- HttpClient.get(url) sends an HTTP GET request to the specified URL.
+- Returns an Observable, which represents a future value (the response).
+- We don’t get the response immediately; we need to subscribe to it.
+
+##### Subscribe to Observable
+```
+  .subscribe(val => console.log(val));
+
+```
+- subscribe() is how you listen to the Observable.
+- The callback val => console.log(val) is executed once the HTTP response arrives.
+- Without subscribe(), the request will not be made, because Observables are lazy.
+
+##### You can also handle errors and completion:
+```
+.subscribe({
+  next: val => console.log(val),
+  error: err => console.error(err),
+  complete: () => console.log("Request complete")
+});
+```
