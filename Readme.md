@@ -1173,3 +1173,198 @@ this.http.get('/api/courses')
   complete: () => console.log("Request complete")
 });
 ```
+#### Api with parameters
+
+```
+  ngOnInit() {
+    const params = new HttpParams()
+        .set("page","1")
+        .set("pageSize","10");
+    this.http.get('/api/courses',{params})
+        .subscribe(
+          courses => this.courses=courses 
+        )
+  }
+
+```
+- Creating HttpParams
+```
+const params = new HttpParams()
+    .set("page","1")
+    .set("pageSize","10");
+
+
+// HTTP GET requests cannot send a request body.
+// Data like pagination, filters, sorting is sent via query parameters.
+// HttpParams helps build query strings safely.
+```
+
+- Making the HTTP GET request
+```
+this.http.get('/api/courses', { params })
+
+// What this generates internally:
+// /api/courses?page=1&pageSize=10
+
+
+```
+### Can We Get Data Without subscribe()?
+#### Using async pipe
+- async pipe going to allow us to implicitly subscribe to the observable from the template
+
+-- app.componenets.ts
+```
+export class AppComponent implements OnInit {
+
+  courses$ : Observable<Course[]>;
+
+  courses;
+
+  constructor(private http: HttpClient) {
+    
+  }
+
+  ngOnInit() {
+    const params = new HttpParams()
+        .set("page","1")
+        .set("pageSize","10");
+    this.courses$ = this.http.get<Course[]>('/api/courses',{params});
+  }
+
+
+
+}
+```
+--app.components.html
+```
+  <course-card *ngFor="let course of (courses$ | async)"
+                 [course]="course">
+
+      <course-image [src]="course.iconUrl"></course-image>
+
+    </course-card>
+
+//OR
+
+ <div class="courses" *ngIf="courses$ | async as courses">
+
+    <course-card *ngFor="let course of courses"
+                 [course]="course">
+
+      <course-image [src]="course.iconUrl"></course-image>
+
+    </course-card>
+
+  </div>
+````
+### Create Custom angular service
+
+```
+ng generate service services/courses
+```
+
+```
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {
+
+  constructor() { }
+}
+// here we can see plane ts class where added Injectable decorator means this service is injectable in our componenet just like http client service(which was inbuild)
+```
+
+
+#### @Injectable({ providedIn: 'root' }) Explained
+- When a service is provided in root, Angular creates a single instance of that service and shares it across the entire application using the root dependency injector.
+```
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {}
+
+//providedIn: 'root' → One instance for whole app
+```
+##### Injecting the Same Service in Multiple Components
+```
+// app component
+constructor(private coursesService: CoursesService) { //injected courses service here
+  console.log(this.coursesService);
+}
+
+```
+```
+// course card component
+constructor(private coursesService: CoursesService) {
+  console.log(this.coursesService);
+}
+
+```
+- Angular automatically injects CoursesService
+- No manual creation using new
+- Same service can be injected anywhere
+
+#### This type of service is knows as singleton service, Singleton simply means that there is only one instance.
+
+### Implementation of custom service
+
+```
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Course } from '../model/course';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {
+
+  constructor(private http:HttpClient) { }
+  loadCourses(): Observable<Course[]>{
+    const params = new HttpParams()
+        .set("page","1")
+        .set("pageSize","10");
+    return this.http.get<Course[]>('/api/courses',{params});
+  }
+}
+
+```
+
+```
+import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {COURSES} from '../db-data';
+import {Course} from './model/course';
+import {CourseCardComponent} from './course-card/course-card.component';
+import {HighlightedDirective} from './directives/highlighted.directive';
+import {Observable} from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { CoursesService } from './services/courses.service';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    standalone: false
+})
+export class AppComponent implements OnInit {
+
+  courses$ : Observable<Course[]>;
+
+ 
+
+  constructor(private coursesService: CoursesService) {
+  
+  }
+
+  ngOnInit() {
+    this.courses$ = this.coursesService.loadCourses();
+  }
+
+
+
+}
+
+```
+
