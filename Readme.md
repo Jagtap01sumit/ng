@@ -1308,8 +1308,8 @@ constructor(private coursesService: CoursesService) {
 
 #### This type of service is knows as singleton service, Singleton simply means that there is only one instance.
 
-### Implementation of custom service
-
+## Implementation of custom service
+### GET API
 ```
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -1368,3 +1368,198 @@ export class AppComponent implements OnInit {
 
 ```
 
+### PUT API
+- course-card.component.html (Child Template)
+```
+
+
+
+```html
+<div class="course-card" *ngIf="course">
+
+  <div class="course-title">
+    {{ cardIndex }} {{ course.description }}
+  </div>
+
+  <ng-container *ngIf="course.iconUrl">
+    <ng-content select="course-image"></ng-content>
+  </ng-container>
+
+  <div class="course-description">
+    Edit Title:
+    <input #courseTitle [value]="course.description">
+  </div>
+
+  <div class="course-category" [ngSwitch]="course.category">
+    <div *ngSwitchCase="'BEGINNER'">Beginner</div>
+    <div *ngSwitchCase="'INTERMEDIATE'">Intermediate</div>
+    <div *ngSwitchCase="'ADVANCED'">Advanced</div>
+  </div>
+
+  <button (click)="onSaveClicked(courseTitle.value)">
+    Save Course
+  </button>
+
+</div>
+```
+- course-card.component.ts (Child Logic)
+```
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Course } from '../model/course';
+
+@Component({
+  selector: 'course-card',
+  templateUrl: './course-card.component.html'
+})
+export class CourseCardComponent {
+
+  @Input()
+  course: Course;
+
+  @Input()
+  cardIndex: number;
+
+  @Output('courseChanged')
+  courseEmitter = new EventEmitter<Course>();
+
+  onSaveClicked(description: string) {
+    this.courseEmitter.emit({
+      ...this.course,
+      description
+    });
+  }
+}
+
+```
+```
+//course.service.ts
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Course } from '../model/course';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {
+
+  constructor(private http:HttpClient) { }
+
+  saveCourse(course:Course){
+    return this.http.put(`/api/courses/${course.id}`,course)
+  }
+}
+```
+- app.component.html (Parent Template)
+ ```
+<div class="courses" *ngIf="courses$ | async as courses">
+
+  <course-card
+    *ngFor="let course of courses; index as i"
+    [course]="course"
+    [cardIndex]="i"
+    (courseChanged)="save($event)">
+
+    <course-image [src]="course.iconUrl"></course-image>
+
+  </course-card>
+
+</div>
+
+```
+#### The child component can emit an event
+#### The parent component can listen to it
+```
+//app.components.ts (parent)
+import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {COURSES} from '../db-data';
+import {Course} from './model/course';
+import {CourseCardComponent} from './course-card/course-card.component';
+import {HighlightedDirective} from './directives/highlighted.directive';
+import {Observable} from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { CoursesService } from './services/courses.service';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    standalone: false
+})
+export class AppComponent implements OnInit {
+
+  courses$ : Observable<Course[]>;
+
+ 
+
+  constructor(private coursesService: CoursesService) {
+  
+  }
+
+  ngOnInit() {
+    this.courses$ = this.coursesService.loadCourses();
+  }
+  save(course: Course){
+    this.coursesService.saveCourse(course);
+  }
+
+
+}
+
+```
+```
+import {
+    AfterContentInit,
+    AfterViewInit,
+    Component,
+    ContentChildren,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output,
+    QueryList,
+    ViewEncapsulation
+} from '@angular/core';
+import {Course} from '../model/course';
+import {CourseImageComponent} from '../course-image/course-image.component';
+import { CoursesService } from '../services/courses.service';
+
+@Component({
+    selector: 'course-card',
+    templateUrl: './course-card.component.html',
+    styleUrls: ['./course-card.component.css'],
+    standalone: false
+})
+export class CourseCardComponent implements OnInit {
+
+    @Input()
+    course: Course;
+
+    @Input()
+    cardIndex: number;
+
+    @Output('courseChanged')
+    courseEmitter = new EventEmitter<Course>();
+
+
+    constructor(private courseService: CoursesService) {
+
+    }
+
+    ngOnInit() {
+        console.log("coursesService course card", this.courseService)
+
+    }
+
+
+    onSaveClicked(description:string) {
+
+        this.courseEmitter.emit({...this.course, description});
+
+    }
+
+
+
+
+```
