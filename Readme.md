@@ -651,7 +651,7 @@ We have a `CourseCardComponent` that used to render an `<img>` tag internally. N
 ```html
 <div class="courses" *ngIf="courses[0] as course">
   <course-card (courseSelected)="onCourseSelected($event)" [course]="course">
-<<<<<<< Updated upstream
+
     <img width="300" alt="Angular Logo" [src]="course.iconUrl" />
     <div class="course-container">
       <h2>content in course card</h2>
@@ -660,7 +660,7 @@ We have a `CourseCardComponent` that used to render an `<img>` tag internally. N
   </course-card>
 </div>
 ```
-=======
+
     <img width="300" alt="Angular Logo" [src]="course.iconUrl">
 	<div class="course-container">
 		<h2> content in course card </h2>
@@ -669,7 +669,7 @@ We have a `CourseCardComponent` that used to render an `<img>` tag internally. N
   </course-card>
 </div>
 ````
->>>>>>> Stashed changes
+
 
 - Here, the <img> and <h5> elements are placed between the opening and closing tags of <course-card>. These elements are not part of the child component's template directly, but will be projected into it using <ng-content>.
 
@@ -693,7 +693,7 @@ We have a `CourseCardComponent` that used to render an `<img>` tag internally. N
   <div class="course-description">{{course.longDescription}}</div>
   <button (click)="onCourseViewed()">View Course</button>
 </div>
-<<<<<<< Updated upstream
+
 ```
 
 - The <ng-content> tag acts as a placeholder for the content passed from the parent. In this case, the <img> and <h5> from the parent will be rendered inside the child component at the location of <ng-content>.
@@ -1096,8 +1096,7 @@ Remove it using viewContainer.clear()
 encapsulation:ViewEncapsulation.ShadowDom/None/Emulate
 
 if we apply shadowDom then only componenet css can apply for that module, no global css will apply on it
-<<<<<<< HEAD
-=======
+
 ```
 
 - The <ng-content> tag acts as a placeholder for the content passed from the parent. In this case, the <img> and <h5> from the parent will be rendered inside the child component at the location of <ng-content>.
@@ -1149,7 +1148,7 @@ projected image }
 
 - @ContentChildren works similar to @ContentChild()
 
-=======
+
 
 
 ---
@@ -1629,4 +1628,3 @@ export class CourseCardComponent implements OnInit {
 
 
 ```
->>>>>>> ec1cdd61822f0b6fa4d68e180214578f931414bc
