@@ -592,7 +592,7 @@ Direct access to the HTML element.
 
 ### 🔧 Example:
 
-````ts
+```ts
 @ViewChildren(CourseCardComponent) cards!: QueryList<CourseCardComponent>;
 
 ngAfterViewInit() {
@@ -661,14 +661,8 @@ We have a `CourseCardComponent` that used to render an `<img>` tag internally. N
 </div>
 ```
 
-    <img width="300" alt="Angular Logo" [src]="course.iconUrl">
-	<div class="course-container">
-		<h2> content in course card </h2>
-	</div>
-    <h5>total Lessons: 10</h5>
-  </course-card>
-</div>
-````
+
+```
 
 
 - Here, the <img> and <h5> elements are placed between the opening and closing tags of <course-card>. These elements are not part of the child component's template directly, but will be projected into it using <ng-content>.
