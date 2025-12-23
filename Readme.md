@@ -592,7 +592,7 @@ Direct access to the HTML element.
 
 ### 🔧 Example:
 
-```ts
+````ts
 @ViewChildren(CourseCardComponent) cards!: QueryList<CourseCardComponent>;
 
 ngAfterViewInit() {
@@ -651,6 +651,7 @@ We have a `CourseCardComponent` that used to render an `<img>` tag internally. N
 ```html
 <div class="courses" *ngIf="courses[0] as course">
   <course-card (courseSelected)="onCourseSelected($event)" [course]="course">
+<<<<<<< Updated upstream
     <img width="300" alt="Angular Logo" [src]="course.iconUrl" />
     <div class="course-container">
       <h2>content in course card</h2>
@@ -659,6 +660,16 @@ We have a `CourseCardComponent` that used to render an `<img>` tag internally. N
   </course-card>
 </div>
 ```
+=======
+    <img width="300" alt="Angular Logo" [src]="course.iconUrl">
+	<div class="course-container">
+		<h2> content in course card </h2>
+	</div>
+    <h5>total Lessons: 10</h5>
+  </course-card>
+</div>
+````
+>>>>>>> Stashed changes
 
 - Here, the <img> and <h5> elements are placed between the opening and closing tags of <course-card>. These elements are not part of the child component's template directly, but will be projected into it using <ng-content>.
 
@@ -682,6 +693,7 @@ We have a `CourseCardComponent` that used to render an `<img>` tag internally. N
   <div class="course-description">{{course.longDescription}}</div>
   <button (click)="onCourseViewed()">View Course</button>
 </div>
+<<<<<<< Updated upstream
 ```
 
 - The <ng-content> tag acts as a placeholder for the content passed from the parent. In this case, the <img> and <h5> from the parent will be rendered inside the child component at the location of <ng-content>.
@@ -1080,3 +1092,55 @@ Remove it using viewContainer.clear()
 encapsulation:ViewEncapsulation.ShadowDom/None/Emulate
 
 if we apply shadowDom then only componenet css can apply for that module, no global css will apply on it
+=======
+```
+
+- The <ng-content> tag acts as a placeholder for the content passed from the parent. In this case, the <img> and <h5> from the parent will be rendered inside the child component at the location of <ng-content>.
+
+- You can also use **selectors** to control **where specific types of content** should be projected. ex. img, class, id
+
+- Key Points
+- <ng-content> enables content projection from parent to child.
+- Useful for creating reusable and flexible components.
+- The parent controls what content is projected.
+- The child defines where the projected content should appear.
+
+# Angular `@ContentChild()` Decorator
+
+## 🧩 What is `@ContentChild()`?
+
+In Angular, `@ViewChild()` is used to access elements **inside the component's own template**.  
+However, when you use **content projection** via `<ng-content>`, the projected content is **not part of the component's view**, so `@ViewChild()` **cannot access it**.
+
+To access projected content, Angular provides the `@ContentChild()` decorator.
+
+---
+
+## 🆚 Why `@ViewChild()` Doesn't Work with `<ng-content>`
+
+When you try to use `@ViewChild()` to access a template reference inside projected content, it returns `undefined`.
+
+### ❌ Example (Fails):
+
+````html
+<!-- Parent Component -->
+<course-card>
+  <img #courseImage src="..." />
+</course-card>
+
+// Inside CourseCardComponent @ViewChild('courseImage') image: ElementRef;
+ngAfterViewInit() { console.log(this.image); // ❌ undefined } This fails
+because courseImage is not part of the view, it's projected content. ### To
+access projected content, use @ContentChild() instead. ```ts // Inside
+CourseCardComponent @ContentChild('courseImage') image: ElementRef;
+ngAfterContentInit() { console.log(this.image); // ✅ ElementRef of the
+projected image }
+````
+
+- The scope of @ContentChild() is limited to content projected via <ng-content>.
+- It cannot access elements that are outside of the <ng-content> projection area.
+
+## @ContentChildren()
+
+- @ContentChildren works similar to @ContentChild()
+
