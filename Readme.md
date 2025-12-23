@@ -729,15 +729,19 @@ When you try to use `@ViewChild()` to access a template reference inside project
   <img #courseImage src="..." />
 </course-card>
 
-// Inside CourseCardComponent @ViewChild('courseImage') image: ElementRef;
+````
+// Inside CourseCardComponent 
+
+```@ViewChild('courseImage') image: ElementRef;
 ngAfterViewInit() { console.log(this.image); // ❌ undefined } This fails
-because courseImage is not part of the view, it's projected content. ### To
-access projected content, use @ContentChild() instead. ```ts // Inside
+because courseImage is not part of the view, it's projected content.
+```
+### To access projected content, use @ContentChild() instead. 
+```ts // Inside
 CourseCardComponent @ContentChild('courseImage') image: ElementRef;
 ngAfterContentInit() { console.log(this.image); // ✅ ElementRef of the
 projected image }
-````
-
+```
 - The scope of @ContentChild() is limited to content projected via <ng-content>.
 - It cannot access elements that are outside of the <ng-content> projection area.
 
@@ -1092,6 +1096,7 @@ Remove it using viewContainer.clear()
 encapsulation:ViewEncapsulation.ShadowDom/None/Emulate
 
 if we apply shadowDom then only componenet css can apply for that module, no global css will apply on it
+<<<<<<< HEAD
 =======
 ```
 
@@ -1144,3 +1149,484 @@ projected image }
 
 - @ContentChildren works similar to @ContentChild()
 
+=======
+
+
+---
+---
+### Angular HTTP Client - Get call with Request parameter
+```
+export class AppComponent implements OnInit {
+
+
+  courses = COURSES;
+
+  constructor(private http: HttpClient) {
+      console.log("hellol̥");
+  }
+
+  ngOnInit() {
+    this.http.get('/api/courses')
+        .subscribe(
+          val=>console.log(val)
+        )
+  }
+
+
+
+}
+
+# The constructor is called first, when Angular creates the component instance.
+# Its job is to initialize the component and inject any dependencies you need.
+```
+##### Why HttpClient is injected:
+
+- Angular uses dependency injection (DI) to provide services like HttpClient.
+
+- You don’t create HttpClient manually; Angular provides a ready-to-use instance.
+
+- Syntax:
+
+```
+private http: HttpClient
+```
+- private automatically creates a class property http you can use in the component.
+
+- Type HttpClient tells Angular what service to inject.
+
+##### Why we don’t make API calls here:
+
+- The constructor only initializes the class, it should not contain logic that depends on Angular bindings or DOM.
+
+- Component properties like @Input() are not yet initialized in the constructor.
+
+- Therefore, API calls are deferred to ngOnInit.
+
+##### ngOnInit Lifecycle Hook
+```
+ngOnInit() {
+    this.http.get('/api/courses')
+        .subscribe(val => console.log(val));
+}
+
+```
+- It’s a lifecycle hook that Angular calls after the component is fully initialized, including input bindings.
+- Ideal place to put initialization logic that depends on Angular (e.g., API calls, DOM queries).
+- ngOnInit guarantees the component is ready.
+  
+##### HttpClient and API Calls
+```
+this.http.get('/api/courses')
+```
+- HttpClient.get(url) sends an HTTP GET request to the specified URL.
+- Returns an Observable, which represents a future value (the response).
+- We don’t get the response immediately; we need to subscribe to it.
+
+##### Subscribe to Observable
+```
+  .subscribe(val => console.log(val));
+
+```
+- subscribe() is how you listen to the Observable.
+- The callback val => console.log(val) is executed once the HTTP response arrives.
+- Without subscribe(), the request will not be made, because Observables are lazy.
+
+##### You can also handle errors and completion:
+```
+.subscribe({
+  next: val => console.log(val),
+  error: err => console.error(err),
+  complete: () => console.log("Request complete")
+});
+```
+#### Api with parameters
+
+```
+  ngOnInit() {
+    const params = new HttpParams()
+        .set("page","1")
+        .set("pageSize","10");
+    this.http.get('/api/courses',{params})
+        .subscribe(
+          courses => this.courses=courses 
+        )
+  }
+
+```
+- Creating HttpParams
+```
+const params = new HttpParams()
+    .set("page","1")
+    .set("pageSize","10");
+
+
+// HTTP GET requests cannot send a request body.
+// Data like pagination, filters, sorting is sent via query parameters.
+// HttpParams helps build query strings safely.
+```
+
+- Making the HTTP GET request
+```
+this.http.get('/api/courses', { params })
+
+// What this generates internally:
+// /api/courses?page=1&pageSize=10
+
+
+```
+### Can We Get Data Without subscribe()?
+#### Using async pipe
+- async pipe going to allow us to implicitly subscribe to the observable from the template
+
+-- app.componenets.ts
+```
+export class AppComponent implements OnInit {
+
+  courses$ : Observable<Course[]>;
+
+  courses;
+
+  constructor(private http: HttpClient) {
+    
+  }
+
+  ngOnInit() {
+    const params = new HttpParams()
+        .set("page","1")
+        .set("pageSize","10");
+    this.courses$ = this.http.get<Course[]>('/api/courses',{params});
+  }
+
+
+
+}
+```
+--app.components.html
+```
+  <course-card *ngFor="let course of (courses$ | async)"
+                 [course]="course">
+
+      <course-image [src]="course.iconUrl"></course-image>
+
+    </course-card>
+
+//OR
+
+ <div class="courses" *ngIf="courses$ | async as courses">
+
+    <course-card *ngFor="let course of courses"
+                 [course]="course">
+
+      <course-image [src]="course.iconUrl"></course-image>
+
+    </course-card>
+
+  </div>
+````
+### Create Custom angular service
+
+```
+ng generate service services/courses
+```
+
+```
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {
+
+  constructor() { }
+}
+// here we can see plane ts class where added Injectable decorator means this service is injectable in our componenet just like http client service(which was inbuild)
+```
+
+
+#### @Injectable({ providedIn: 'root' }) Explained
+- When a service is provided in root, Angular creates a single instance of that service and shares it across the entire application using the root dependency injector.
+```
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {}
+
+//providedIn: 'root' → One instance for whole app
+```
+##### Injecting the Same Service in Multiple Components
+```
+// app component
+constructor(private coursesService: CoursesService) { //injected courses service here
+  console.log(this.coursesService);
+}
+
+```
+```
+// course card component
+constructor(private coursesService: CoursesService) {
+  console.log(this.coursesService);
+}
+
+```
+- Angular automatically injects CoursesService
+- No manual creation using new
+- Same service can be injected anywhere
+
+#### This type of service is knows as singleton service, Singleton simply means that there is only one instance.
+
+## Implementation of custom service
+### GET API
+```
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Course } from '../model/course';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {
+
+  constructor(private http:HttpClient) { }
+  loadCourses(): Observable<Course[]>{
+    const params = new HttpParams()
+        .set("page","1")
+        .set("pageSize","10");
+    return this.http.get<Course[]>('/api/courses',{params});
+  }
+}
+
+```
+
+```
+import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {COURSES} from '../db-data';
+import {Course} from './model/course';
+import {CourseCardComponent} from './course-card/course-card.component';
+import {HighlightedDirective} from './directives/highlighted.directive';
+import {Observable} from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { CoursesService } from './services/courses.service';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    standalone: false
+})
+export class AppComponent implements OnInit {
+
+  courses$ : Observable<Course[]>;
+
+ 
+
+  constructor(private coursesService: CoursesService) {
+  
+  }
+
+  ngOnInit() {
+    this.courses$ = this.coursesService.loadCourses();
+  }
+
+
+
+}
+
+```
+
+### PUT API
+- course-card.component.html (Child Template)
+```
+
+
+
+```html
+<div class="course-card" *ngIf="course">
+
+  <div class="course-title">
+    {{ cardIndex }} {{ course.description }}
+  </div>
+
+  <ng-container *ngIf="course.iconUrl">
+    <ng-content select="course-image"></ng-content>
+  </ng-container>
+
+  <div class="course-description">
+    Edit Title:
+    <input #courseTitle [value]="course.description">
+  </div>
+
+  <div class="course-category" [ngSwitch]="course.category">
+    <div *ngSwitchCase="'BEGINNER'">Beginner</div>
+    <div *ngSwitchCase="'INTERMEDIATE'">Intermediate</div>
+    <div *ngSwitchCase="'ADVANCED'">Advanced</div>
+  </div>
+
+  <button (click)="onSaveClicked(courseTitle.value)">
+    Save Course
+  </button>
+
+</div>
+```
+- course-card.component.ts (Child Logic)
+```
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Course } from '../model/course';
+
+@Component({
+  selector: 'course-card',
+  templateUrl: './course-card.component.html'
+})
+export class CourseCardComponent {
+
+  @Input()
+  course: Course;
+
+  @Input()
+  cardIndex: number;
+
+  @Output('courseChanged')
+  courseEmitter = new EventEmitter<Course>();
+
+  onSaveClicked(description: string) {
+    this.courseEmitter.emit({
+      ...this.course,
+      description
+    });
+  }
+}
+
+```
+```
+//course.service.ts
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Course } from '../model/course';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {
+
+  constructor(private http:HttpClient) { }
+
+  saveCourse(course:Course){
+    return this.http.put(`/api/courses/${course.id}`,course)
+  }
+}
+```
+- app.component.html (Parent Template)
+ ```
+<div class="courses" *ngIf="courses$ | async as courses">
+
+  <course-card
+    *ngFor="let course of courses; index as i"
+    [course]="course"
+    [cardIndex]="i"
+    (courseChanged)="save($event)">
+
+    <course-image [src]="course.iconUrl"></course-image>
+
+  </course-card>
+
+</div>
+
+```
+#### The child component can emit an event
+#### The parent component can listen to it
+```
+//app.components.ts (parent)
+import {AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren} from '@angular/core';
+import {COURSES} from '../db-data';
+import {Course} from './model/course';
+import {CourseCardComponent} from './course-card/course-card.component';
+import {HighlightedDirective} from './directives/highlighted.directive';
+import {Observable} from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { CoursesService } from './services/courses.service';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+    standalone: false
+})
+export class AppComponent implements OnInit {
+
+  courses$ : Observable<Course[]>;
+
+ 
+
+  constructor(private coursesService: CoursesService) {
+  
+  }
+
+  ngOnInit() {
+    this.courses$ = this.coursesService.loadCourses();
+  }
+  save(course: Course){
+    this.coursesService.saveCourse(course);
+  }
+
+
+}
+
+```
+```
+import {
+    AfterContentInit,
+    AfterViewInit,
+    Component,
+    ContentChildren,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output,
+    QueryList,
+    ViewEncapsulation
+} from '@angular/core';
+import {Course} from '../model/course';
+import {CourseImageComponent} from '../course-image/course-image.component';
+import { CoursesService } from '../services/courses.service';
+
+@Component({
+    selector: 'course-card',
+    templateUrl: './course-card.component.html',
+    styleUrls: ['./course-card.component.css'],
+    standalone: false
+})
+export class CourseCardComponent implements OnInit {
+
+    @Input()
+    course: Course;
+
+    @Input()
+    cardIndex: number;
+
+    @Output('courseChanged')
+    courseEmitter = new EventEmitter<Course>();
+
+
+    constructor(private courseService: CoursesService) {
+
+    }
+
+    ngOnInit() {
+        console.log("coursesService course card", this.courseService)
+
+    }
+
+
+    onSaveClicked(description:string) {
+
+        this.courseEmitter.emit({...this.course, description});
+
+    }
+
+
+
+
+```
+>>>>>>> ec1cdd61822f0b6fa4d68e180214578f931414bc
