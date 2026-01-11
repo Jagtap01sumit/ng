@@ -1611,14 +1611,8 @@ export class CourseCardComponent implements OnInit {
 
     }
 
-
     onSaveClicked(description:string) {
-
         this.courseEmitter.emit({...this.course, description});
-
     }
-
-
-
 
 ```
