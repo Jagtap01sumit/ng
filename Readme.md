@@ -1616,3 +1616,170 @@ export class CourseCardComponent implements OnInit {
     }
 
 ```
+### Dependency injection
+```
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CoursesService {
+
+  constructor(private http: HttpClient) {}
+
+  loadCourses() {
+    return this.http.get<any[]>('/api/courses');
+  }
+}
+```
+
+-- @Injectable tells Angular that this class can be created and injected by the Dependency Injection (DI) system.
+-- Without @Injectable, Angular:
+❌ cannot inject dependencies into this class
+❌ will throw an error if the constructor has parameters
+
+
+#### What does providedIn: 'root' mean?
+```
+@Injectable({
+  providedIn: 'root'
+})
+```
+-- Meaning: providedIn: 'root' registers this service in the root injector.
+-- this is also called tree-shakable
+-- Tree-shakable means unused code is automatically removed from the final build so the application bundle becomes smaller and faster.
+### If we not use @Injectable:
+```
+//angular shows 
+NullInjectorError: No provider for HttpClient
+```
+#### So… what must you create MANUALLY?
+
+1️⃣ Create the instance yourself
+```
+const coursesService = new CoursesService(httpClient);
+```
+But Angular doesn’t know what httpClient is yet…
+2️⃣ Tell Angular HOW to create it (Factory)
+```
+export function coursesServiceFactory(
+  http: HttpClient
+): CoursesService {
+  return new CoursesService(http);
+}
+```
+This replaces @Injectable.
+3️⃣ Tell Angular WHERE to use it (Provider)
+```
+providers: [
+  {
+    provide: CoursesService,
+    useFactory: coursesServiceFactory,
+    deps: [HttpClient]
+  }
+]
+```
+Now Angular:
+injects HttpClient
+call your factory
+uses the returned object'
+
+## Manual Provider Creation with Factory & InjectionToken (Angular)Complete MANUAL version (no @Injectable)
+```// 1️⃣ Import required Angular core and HTTP modules
+import { Component, Inject, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+// 2️⃣ Import the service class (no @Injectable used here)
+import { CoursesService } from './courses.service';
+
+// 3️⃣ Import InjectionToken to create a unique DI key
+import { InjectionToken } from '@angular/core';
+
+
+// 4️⃣ FACTORY FUNCTION
+// This function MANUALLY creates the CoursesService instance
+// Angular will call this when the token is requested
+export function coursesServiceFactory(
+  http: HttpClient
+): CoursesService {
+  return new CoursesService(http);
+}
+
+
+// 5️⃣ INJECTION TOKEN
+// A unique identifier used instead of the service class
+export const COURSES_SERVICE =
+  new InjectionToken<CoursesService>('COURSES_SERVICE');
+
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+
+  // 6️⃣ PROVIDER CONFIGURATION
+  // Tells Angular:
+  // - When COURSES_SERVICE is requested
+  // - Call coursesServiceFactory()
+  // - Inject HttpClient into the factory
+  providers: [
+    {
+      provide: COURSES_SERVICE,
+      useFactory: coursesServiceFactory,
+      deps: [HttpClient]
+    }
+  ]
+})
+export class AppComponent implements OnInit {
+
+  courses$!: Observable<any[]>;
+
+  // 7️⃣ CONSTRUCTOR INJECTION
+  // Angular sees @Inject(COURSES_SERVICE)
+  // → looks up provider
+  // → calls factory
+  // → injects the returned CoursesService
+  constructor(
+    @Inject(COURSES_SERVICE)
+    private coursesService: CoursesService
+  ) {}
+
+  // 8️⃣ SERVICE USAGE
+  // The injected service is used normally
+  ngOnInit() {
+    this.courses$ = this.coursesService.loadCourses();
+  }
+}
+```
+🔹 @Optional
+
+If the dependency is not found, Angular will not throw an error.
+The injected value will be null.
+```
+constructor(@Optional()
+    private coursesService: CoursesService
+  ) {}
+```
+🔹 @Self
+
+Angular looks for the dependency only in the current injector.
+It will not check parent injectors.
+Angular checks only this component’s providers
+✔ Ignores parent injectors
+```
+constructor(@Self()
+    private coursesService: CoursesService
+  ) {}
+```
+🔹 @SkipSelf
+
+Angular skips the current injector and looks in the parent injector.
+Used when you want a parent-level dependency.
+Angular skips this component
+✔ Gets the service from parent injector
+```
+constructor(@SkipSelf()
+    private coursesService: CoursesService
+  ) {}
+```
