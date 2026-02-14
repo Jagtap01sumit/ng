@@ -1783,3 +1783,97 @@ constructor(@SkipSelf()
     private coursesService: CoursesService
   ) {}
 ```
+# Angular Dependency Injection — Using Class A inside Class B
+
+## 🧩 DI Scenario Table
+
+| Scenario | AService | BService | Will it Work? | Why |
+|---|---|---|---|---|
+| ❌ Case 1 | `@Injectable({providedIn:'root'})` | Normal class | ❌ No | Angular cannot create BService instance |
+| ✅ Case 2 | `@Injectable({providedIn:'root'})` | `@Injectable({providedIn:'root'})` | ✅ Yes | Both are registered in DI container |
+| ✅ Case 3 | `@Injectable({providedIn:'root'})` | `@Injectable()` + provided in component | ✅ Yes | B instance created at component level |
+| ❌ Case 4 | Normal class | Normal class | ❌ No | Angular DI not used at all |
+| ⚠️ Case 5 | `@Injectable({providedIn:'root'})` | `new AService()` manually | ⚠️ Works but BAD | Breaks DI pattern |
+
+---
+
+## 🏗 Instance Scope Table
+
+| Where Provider is Defined | Instance Count |
+|---|---|
+| `providedIn: 'root'` | One for whole app (Singleton) |
+| Component `providers` | New per component instance |
+| Directive `providers` | New per directive instance |
+
+---
+
+## 🧠 Responsibility Table
+
+| Concept | Who Controls It |
+|---|---|
+| Instance Creation | Angular Injector |
+| Instance Scope | `providedIn` / `providers` |
+| Using Service | Constructor Injection |
+
+---
+
+## 🔥 Most Important Rules
+
+| Rule | Meaning |
+|---|---|
+| Class has dependencies → must be `@Injectable()` | So Angular can inject constructor params |
+| `@Injectable({providedIn:'root'})` → write once | Not repeated in components |
+| Constructor injection ≠ instance creation | Only instance usage |
+
+---
+
+## 📌 Quick Memory Guide
+
+| You Want | Do This |
+|---|---|
+| Global Singleton Service | `@Injectable({providedIn:'root'})` |
+| New Instance Per Component | Add service in `@Component providers` |
+| Use Service Anywhere | Inject in constructor |
+
+---
+
+## ✅ Example (Working Code)
+
+```ts
+@Injectable({
+  providedIn: 'root'
+})
+export class AService {
+  sayHello() {
+    return 'Hello from A';
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class BService {
+  constructor(private aService: AService) {}
+
+  callA() {
+    return this.aService.sayHello();
+  }
+}
+```
+
+---
+
+## ❌ Wrong Example
+
+```ts
+export class BService {
+  constructor(private aService: AService) {} // Will fail (Not Injectable)
+}
+```
+
+---
+
+## 🧠 Golden Rule
+
+> Providers decide **how many instances exist**  
+> Constructor injection decides **which instance you get**
