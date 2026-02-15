@@ -1877,3 +1877,257 @@ export class BService {
 
 > Providers decide **how many instances exist**  
 > Constructor injection decides **which instance you get**
+>
+===
+===
+
+# 🧠 What is Change Detection?
+
+Change Detection is the process where Angular: - Detects data changes -
+Updates UI (DOM) automatically
+
+Whenever data changes → Angular checks → UI updates.
+
+------------------------------------------------------------------------
+
+# ⚙️ Why Change Detection Exists
+
+Without Change Detection: - UI will not update automatically -
+Developers must manually update DOM
+
+Angular gives: ✅ Automatic UI sync\
+✅ Performance optimized checking\
+✅ Predictable update cycle
+
+------------------------------------------------------------------------
+
+# 🔁 Change Detection Cycle (Simple Flow)
+
+Event Happens ↓ Angular Runs Change Detection ↓ Checks Component Data ↓
+Updates DOM If Needed
+
+------------------------------------------------------------------------
+
+# 🚀 What Triggers Change Detection?
+
+✅ User Events (click, keyup, input)\
+✅ HTTP Responses\
+✅ Timers (setTimeout, setInterval)\
+✅ Promises / Async operations\
+✅ Input reference change from parent
+
+------------------------------------------------------------------------
+
+# 🧬 Change Detection Strategies
+
+------------------------------------------------------------------------
+
+## 🔵 Default Strategy
+
+✔ Checks component + all children\
+✔ Detects object mutation\
+✔ Detects reference change
+
+Example: this.course.description = "New Title"; // Works
+
+------------------------------------------------------------------------
+
+## 🔴 OnPush Strategy
+
+✔ Checks only when: - Input reference changes - Event happens inside
+component - Observable emits value - Manual trigger used
+
+❌ Does NOT detect object mutation reliably
+
+------------------------------------------------------------------------
+
+# 📊 Default vs OnPush
+
+  Feature                       Default   OnPush
+  ----------------------------- --------- --------
+  Detect Object Mutation        ✅        ❌
+  Detect New Object Reference   ✅        ✅
+  Performance                   Medium    High
+
+------------------------------------------------------------------------
+
+# 🧩 Change Detection 
+
+------------------------------------------------------------------------
+
+## 🧩 Part 1 --- Input Property
+
+@Input() course: Course;
+
+### Change Detection Meaning
+
+If parent does: this.course = newCourse;
+
+✅ Change Detection runs\
+✅ UI updates
+
+------------------------------------------------------------------------
+
+If parent does: this.course.description = "New Title";
+
+👉 Default → Works\
+👉 OnPush → May fail
+
+------------------------------------------------------------------------
+
+## 🧩 Part 2 --- Mutation Change (Typing Case)
+
+onTitleChanged(newTitle: string){ this.course.description = newTitle; }
+
+------------------------------------------------------------------------
+
+### Change Detection Flow
+
+User types ↓ keyup event fires ↓ Function runs ↓ Object property changes
+↓ Default Change Detection detects change ↓ UI updates
+
+------------------------------------------------------------------------
+
+### Problem In OnPush
+
+Because: Object reference same
+
+Angular may skip checking.
+
+------------------------------------------------------------------------
+
+## 🧩 Part 3 --- Template Event Trigger
+
+(keyup)="onTitleChanged(courseTitle.value)"
+
+------------------------------------------------------------------------
+
+### Why Change Detection Runs
+
+Angular triggers Change Detection on: - Click - Keyup - Input - Events
+
+------------------------------------------------------------------------
+
+## 🧩 Part 4 --- Output Event
+
+@Output() courseEmitter = new EventEmitter`<Course>`{=html}();
+
+Purpose: Send updated data to parent.
+
+------------------------------------------------------------------------
+
+## 🧩 Part 5 --- Immutable Update (Most Important)
+
+onSaveClicked(description: string) {
+this.courseEmitter.emit({...this.course, description}); }
+
+------------------------------------------------------------------------
+
+### Why Spread Operator Is Important
+
+{...this.course, description}
+
+Creates: ✅ New object\
+✅ New reference
+
+------------------------------------------------------------------------
+
+### Change Detection Flow
+
+Click Save ↓ New Object Created ↓ Event Sent To Parent ↓ Parent Updates
+Data ↓ Child Gets New Input Reference ↓ Change Detection Runs
+
+------------------------------------------------------------------------
+
+## 🧩 Part 6 --- Template Binding
+
+{{ course.description }}
+
+Updates when: - Property changes (Default) - Object reference changes
+(Default + OnPush)
+
+------------------------------------------------------------------------
+
+# 🧪 Mutation vs Immutable (From My Code)
+
+------------------------------------------------------------------------
+
+## ❌ Mutation (Typing Case)
+
+this.course.description = newTitle;
+
+Same reference → Risky for OnPush.
+
+------------------------------------------------------------------------
+
+## ✅ Immutable (Save Case)
+
+{...this.course}
+
+New reference → Best practice → Works in OnPush.
+
+------------------------------------------------------------------------
+
+# ⭐ Golden Rules
+
+------------------------------------------------------------------------
+
+✅ Prefer Immutable Updates\
+✅ Use OnPush in large apps\
+✅ Avoid direct object mutation in production\
+✅ Use Output events to sync with parent
+
+------------------------------------------------------------------------
+
+# 🛠 Manual Change Detection (Advanced)
+
+------------------------------------------------------------------------
+
+## detectChanges()
+
+Manually trigger CD.
+
+------------------------------------------------------------------------
+
+## markForCheck()
+
+Tell Angular to check component next cycle.
+
+------------------------------------------------------------------------
+
+## detach()
+
+Stop automatic CD.
+
+------------------------------------------------------------------------
+
+## reattach()
+
+Resume automatic CD.
+
+------------------------------------------------------------------------
+
+# 🧠 Interview One-Liner (From My Code)
+
+"My keyup event triggers change detection via Angular event system, and
+Save button uses immutable object creation which ensures change
+detection works even with OnPush strategy."
+
+------------------------------------------------------------------------
+
+# 🧾 Real Life Analogy
+
+------------------------------------------------------------------------
+
+### Default Strategy
+
+Teacher checks every notebook daily.
+
+------------------------------------------------------------------------
+
+### OnPush Strategy
+
+Teacher checks notebook only if: - New notebook submitted - Student
+calls teacher
+
+--------
