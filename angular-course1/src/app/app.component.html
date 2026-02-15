@@ -7,24 +7,14 @@
 
   <div>
 
-    <div class="demo">
-
-
-      <button (click)="onEditCourse()" i18n>Edit Course</button>
-
-    </div>
-
     <div class="courses">
 
-      @for (course of  courses  ; track course) {
+      @for (course of courses; track course) {
         <course-card
-          (courseChanged)="save($event)"
-          type="beginner"
           [course]="course">
         <course-image [src]="course.iconUrl"></course-image>
       </course-card>
     }
-
 
   </div>
 

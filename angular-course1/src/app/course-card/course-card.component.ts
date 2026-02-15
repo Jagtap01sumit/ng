@@ -31,7 +31,9 @@ export class CourseCardComponent implements OnInit {
     @Output('courseChanged')
     courseEmitter = new EventEmitter<Course>();
 
-
+onTitleChanged(newTitle:string){
+  this.course.description= newTitle;
+}
     constructor() {
 
     }

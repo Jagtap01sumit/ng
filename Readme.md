@@ -1618,6 +1618,8 @@ export class CourseCardComponent implements OnInit {
 ```
 ### Dependency injection
 ```
+
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -1640,6 +1642,7 @@ export class CoursesService {
 ❌ will throw an error if the constructor has parameters
 
 
+=======
 #### What does providedIn: 'root' mean?
 ```
 @Injectable({
@@ -2131,3 +2134,8 @@ Teacher checks notebook only if: - New notebook submitted - Student
 calls teacher
 
 --------
+=======
+=======
+
+```git git 
+
