@@ -2451,3 +2451,7 @@ Avoid heavy operations inside this hook because it may affect UI rendering perfo
 
 ## Angular Modules
 
+```
+ng generate module Courses
+```
+
