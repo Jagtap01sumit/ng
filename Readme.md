@@ -2408,5 +2408,46 @@ export class DemoComponent implements AfterViewInit {
 
 ## Why we don't access DOM in `ngOnInit`
 
-At the tim
+At the time of `ngOnInit`:
+
+* Angular **has not finished rendering the view**
+
+But in `ngAfterViewInit`:
+
+* **View and child components are fully loaded**
+
+---
+
+## Lifecycle Order Including ngAfterViewInit
+
+```
+Constructor
+↓
+ngOnChanges
+↓
+ngOnInit
+↓
+ngAfterContentChecked
+↓
+ngAfterViewInit
+↓
+ngAfterViewChecked
+```
+
+---
+
+## Quick Summary
+
+| Hook            | Purpose                       | Runs |
+| --------------- | ----------------------------- | ---- |
+| ngAfterViewInit | View & child view initialized | Once |
+
+---
+
+## Important Note
+
+Avoid heavy operations inside this hook because it may affect UI rendering performance.
+
+
+## Angular Modules
 
