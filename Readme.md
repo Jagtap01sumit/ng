@@ -2349,9 +2349,9 @@ Most commonly used hooks in real projects:
 * **ngOnChanges** → input change handling
 
 Other hooks are used **rarely for advanced cases**.
-# 6. ngAfterViewInit()
+### 6. ngAfterViewInit()
 
-## Purpose
+#### Purpose
 
 `ngAfterViewInit` is called **after Angular fully initializes the component's view and its child views**.
 
@@ -2359,7 +2359,7 @@ It is commonly used when we want to **access DOM elements or child components** 
 
 ---
 
-## When it runs
+### When it runs
 
 * Runs **once after Angular initializes the component view**
 * Executes **after the first `ngAfterContentChecked`**
@@ -2367,7 +2367,7 @@ It is commonly used when we want to **access DOM elements or child components** 
 
 ---
 
-## What to use it for
+### What to use it for
 
 * Access DOM elements
 * Work with `@ViewChild`
@@ -2376,15 +2376,15 @@ It is commonly used when we want to **access DOM elements or child components** 
 
 ---
 
-## Example
+#### Example
 
-### HTML
+#### HTML
 
 ```html
 <h2 #title>Hello Angular</h2>
 ```
 
-### Component
+#### Component
 
 ```typescript
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
@@ -2406,7 +2406,7 @@ export class DemoComponent implements AfterViewInit {
 
 ---
 
-## Why we don't access DOM in `ngOnInit`
+#### Why we don't access DOM in `ngOnInit`
 
 At the time of `ngOnInit`:
 
@@ -2418,7 +2418,7 @@ But in `ngAfterViewInit`:
 
 ---
 
-## Lifecycle Order Including ngAfterViewInit
+#### Lifecycle Order Including ngAfterViewInit
 
 ```
 Constructor
@@ -2436,7 +2436,7 @@ ngAfterViewChecked
 
 ---
 
-## Quick Summary
+#### Quick Summary
 
 | Hook            | Purpose                       | Runs |
 | --------------- | ----------------------------- | ---- |
@@ -2444,14 +2444,165 @@ ngAfterViewChecked
 
 ---
 
-## Important Note
+#### Important Note
 
 Avoid heavy operations inside this hook because it may affect UI rendering performance.
 
 
 ## Angular Modules
 
+Angular applications are organized using **Modules**.
+A module helps group related **components, directives, pipes, and services** together.
+
+The root module of every Angular application is **AppModule**.
+
+---
+
+## Create a Module
+
+To generate a module using Angular CLI:
+
 ```
 ng generate module Courses
 ```
+
+or shorter command:
+
+```
+ng g m Courses
+```
+
+This command creates a new folder and module file.
+
+Example structure:
+
+```
+courses/
+ ├── courses.module.ts
+```
+
+---
+
+### Example Module
+
+```typescript
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule
+  ]
+})
+export class CoursesModule { }
+```
+
+---
+
+### Important Properties of NgModule
+
+#### declarations
+
+Contains **components, directives, and pipes** that belong to this module.
+
+```
+declarations: [
+  CourseListComponent
+]
+```
+
+---
+
+#### imports
+
+Used to import **other modules** so their features can be used.
+
+```
+imports: [
+  CommonModule
+]
+```
+
+---
+
+#### exports
+
+Used to make components available to **other modules**.
+
+```
+exports: [
+  CourseListComponent
+]
+```
+
+---
+
+#### providers
+
+Used to register **services**.
+
+```
+providers: [
+  CourseService
+]
+```
+
+---
+
+#### bootstrap
+
+Used only in **root module** to specify the starting component.
+
+```
+bootstrap: [AppComponent]
+```
+
+---
+
+#### Root Module Example
+
+```
+app.module.ts
+```
+
+```typescript
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    CoursesModule
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+---
+
+#### Benefits of Modules
+
+* Organizes large applications
+* Improves maintainability
+* Enables lazy loading
+* Reusable feature grouping
+* Better code structure
+
+---
+
+#### Quick Summary
+
+| Concept        | Purpose                       |
+| -------------- | ----------------------------- |
+| Module         | Organizes related features    |
+| Root Module    | Starting point of Angular app |
+| Feature Module | Groups related functionality  |
+| Lazy Module    | Loads only when needed        |
+
+---
+
+
+## Angular Pipes
 
