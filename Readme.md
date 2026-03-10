@@ -2131,3 +2131,282 @@ Teacher checks notebook only if: - New notebook submitted - Student
 calls teacher
 
 --------
+--------
+# Angular Lifecycle Hooks (Simple Notes)
+
+Angular components go through different **lifecycle stages** from creation to destruction.
+Angular provides **Lifecycle Hooks** that allow us to run code at specific stages.
+
+---
+
+# 1. Constructor()
+
+## Purpose
+
+The constructor is a **TypeScript class method**, not an Angular lifecycle hook.
+It is used for **dependency injection and basic initialization**.
+
+## When it runs
+
+* Runs **when the component class is instantiated**
+* Executes **before Angular initializes the component**
+
+## What to use it for
+
+* Inject services
+* Basic variable initialization
+
+## Example
+
+```typescript
+constructor(private userService: UserService) {
+  console.log("Constructor called");
+}
+```
+
+⚠️ Avoid:
+
+* API calls
+* Complex logic
+
+---
+
+# 2. ngOnChanges()
+
+## Purpose
+
+Runs when **input properties change**.
+
+## When it runs
+
+* Runs **before ngOnInit**
+* Executes **every time an @Input value changes**
+
+## What to use it for
+
+* Detect input updates from parent components
+* Perform logic when input data changes
+
+## Example
+
+```typescript
+ngOnChanges(changes: SimpleChanges) {
+  console.log("Input value changed", changes);
+}
+```
+
+Example Input:
+
+```typescript
+@Input() userName!: string;
+```
+
+---
+
+# 3. ngOnInit()
+
+## Purpose
+
+Most commonly used lifecycle hook.
+
+## When it runs
+
+* Runs **once after the first ngOnChanges**
+* Called **after Angular initializes component inputs**
+
+## What to use it for
+
+* API calls
+* Component initialization
+* Load data
+
+## Example
+
+```typescript
+ngOnInit() {
+  console.log("Component initialized");
+  this.loadUsers();
+}
+```
+
+---
+
+# 4. ngAfterContentChecked()
+
+## Purpose
+
+Runs after Angular **checks projected content** inside `<ng-content>`.
+
+## When it runs
+
+* Called **after every change detection cycle**
+* Runs **multiple times**
+
+## What to use it for
+
+* Respond to content projection updates
+* Validate projected content
+
+## Example
+
+```typescript
+ngAfterContentChecked() {
+  console.log("Content checked");
+}
+```
+
+⚠️ Avoid heavy logic because it runs frequently.
+
+---
+
+# 5. ngAfterViewChecked()
+
+## Purpose
+
+Runs after Angular **checks the component's view and child views**.
+
+## When it runs
+
+* Runs **after view updates**
+* Called **after every change detection cycle**
+
+## What to use it for
+
+* Perform logic after DOM updates
+* Work with child components
+
+## Example
+
+```typescript
+ngAfterViewChecked() {
+  console.log("View checked");
+}
+```
+
+⚠️ Avoid expensive operations here.
+
+---
+
+# Execution Order (Important)
+
+Lifecycle hooks run in this order:
+
+```
+Constructor
+↓
+ngOnChanges
+↓
+ngOnInit
+↓
+ngAfterContentChecked
+↓
+ngAfterViewChecked
+```
+
+---
+
+# Simple Flow Diagram
+
+```
+Component Created
+      │
+      ▼
+Constructor()
+      │
+      ▼
+ngOnChanges()
+      │
+      ▼
+ngOnInit()
+      │
+      ▼
+ngAfterContentChecked()
+      │
+      ▼
+ngAfterViewChecked()
+```
+
+---
+
+# Quick Interview Summary
+
+| Hook                  | Runs When                  | Runs How Many Times |
+| --------------------- | -------------------------- | ------------------- |
+| Constructor           | Component instance created | Once                |
+| ngOnChanges           | Input value changes        | Multiple            |
+| ngOnInit              | Component initialized      | Once                |
+| ngAfterContentChecked | Content checked            | Multiple            |
+| ngAfterViewChecked    | View checked               | Multiple            |
+
+---
+
+# Pro Tip
+
+Most commonly used hooks in real projects:
+
+* **Constructor** → dependency injection
+* **ngOnInit** → API calls
+* **ngOnChanges** → input change handling
+
+Other hooks are used **rarely for advanced cases**.
+# 6. ngAfterViewInit()
+
+## Purpose
+
+`ngAfterViewInit` is called **after Angular fully initializes the component's view and its child views**.
+
+It is commonly used when we want to **access DOM elements or child components** using `@ViewChild` or `@ViewChildren`.
+
+---
+
+## When it runs
+
+* Runs **once after Angular initializes the component view**
+* Executes **after the first `ngAfterContentChecked`**
+* Runs **only one time**
+
+---
+
+## What to use it for
+
+* Access DOM elements
+* Work with `@ViewChild`
+* Initialize third-party libraries (charts, sliders, etc.)
+* Perform DOM related logic
+
+---
+
+## Example
+
+### HTML
+
+```html
+<h2 #title>Hello Angular</h2>
+```
+
+### Component
+
+```typescript
+import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+
+@Component({
+  selector: 'app-demo',
+  templateUrl: './demo.component.html'
+})
+export class DemoComponent implements AfterViewInit {
+
+  @ViewChild('title') title!: ElementRef;
+
+  ngAfterViewInit() {
+    console.log("View initialized");
+    console.log(this.title.nativeElement.innerText);
+  }
+}
+```
+
+---
+
+## Why we don't access DOM in `ngOnInit`
+
+At the tim
+
