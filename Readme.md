@@ -2894,3 +2894,22 @@ export class CounterComponent {
 Increase
 </button>
 ```
+### signal for premitive Datatype
+###### Array
+- dont mutating signal values directly use ..courese then update the value
+```
+
+courses = signal({
+  title: ["Angular for beginners", "Reactive Angular Course"]
+});
+
+increment() {
+
+  this.courses.update(course => ({
+    ...course,
+    title: ["Hello World"]
+  }));
+
+}
+
+```
