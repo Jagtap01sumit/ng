@@ -2716,3 +2716,181 @@ The browser schedules the download efficiently.
 | `on idle`        | Loads when browser is idle        |
 | `when condition` | Loads when condition becomes true |
 
+## Signals()
+### 1. Default Change Detection
+
+**Advantages**
+1. Very easy to use – Angular handles everything automatically.
+2. Works even with mutable data and simple code.
+
+**Disadvantages**
+1. Checks the entire component tree even if only a small value changed.
+2. Can become slow in large applications with many bindings.
+
+---
+
+### 2. OnPush Change Detection
+
+**Advantages**
+1. Much faster because Angular checks only when:
+   - Input references change
+   - Events occur
+   - Observable emits values
+2. Reduces unnecessary checks in the component tree.
+
+**Disadvantages**
+1. Requires immutable data patterns.
+2. Needs stricter coding practices which can make code slightly harder to maintain.
+
+---
+
+### 3. Signals (Modern Angular)
+
+Signals allow state to tell Angular **exactly what changed**.
+
+**Advantages**
+1. Angular updates **only the affected UI parts**.
+2. Improves performance without complex change detection rules.
+3. Cleaner reactive state management.
+
+---
+
+## Examples
+
+This example shows how Angular UI updates when we change a counter.
+
+We will move step by step from:
+
+1. Default Change Detection
+2. OnPush Change Detection
+3. Signals (Modern Angular)
+
+---
+
+# 1️⃣ Default Change Detection
+
+Angular checks the **entire component tree** whenever any event occurs.
+
+### Component
+
+```ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-counter',
+  templateUrl: './counter.component.html'
+})
+export class CounterComponent {
+
+  count = 0;
+
+  increaseCount() {
+    this.count++;
+  }
+
+}
+```
+
+```
+//template
+<h2>Counter: {{ count }}</h2>
+
+<button (click)="increaseCount()">
+Increase
+</button>
+
+//How it works
+
+//1. User clicks button
+
+//2. increaseCount() runs
+
+//3. count value changes
+
+//4. Angular runs change detection on the entire component tree
+
+//5. UI updates
+
+```
+### problem
+
+- Even if only count changed, Angular still checks all components.
+
+This can become slow in large applications.
+
+# 2️⃣ OnPush Change Detection
+```
+//With OnPush, Angular checks the component only when inputs or references change.
+
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+
+@Component({
+  selector: 'app-counter',
+  templateUrl: './counter.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class CounterComponent {
+
+  count = 0;
+
+  increaseCount() {
+    this.count++;
+  }
+
+}
+
+```
+```
+//template
+<h2>Counter: {{ count }}</h2>
+
+<button (click)="increaseCount()">
+Increase
+</button>
+
+- Improvement
+
+// Angular does fewer checks compared to default strategy.
+
+
+```
+### problem
+
+- We must follow:
+
+- Immutable data patterns
+
+- Strict state updates
+
+- Sometimes debugging becomes harder.
+
+# 3️⃣ Signals
+- Signals allow Angular to know exactly which state changed.
+
+- Instead of checking the whole component, Angular updates only the affected UI.
+
+```
+import { Component, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-counter',
+  templateUrl: './counter.component.html'
+})
+export class CounterComponent {
+
+  count = signal(0);
+
+  increaseCount() {
+    this.count.update(value => value + 1);
+  }
+
+}
+```
+```
+//template
+<h2>Counter: {{ count() }}</h2>
+
+<button (click)="increaseCount()">
+Increase
+</button>
+```
