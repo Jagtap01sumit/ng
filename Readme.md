@@ -2913,3 +2913,65 @@ increment() {
 }
 
 ```
+## Angular `effect()` API
+
+`effect()` is used to **run side effects automatically when signals change**.
+
+A side effect means **some action that happens when state changes**, such as:
+
+- Logging
+- API calls
+- LocalStorage updates
+- DOM interactions
+
+`effect()` automatically **tracks signals used inside it** and re-runs whenever those signals change.
+
+---
+
+### Basic Syntax
+
+```ts
+import { signal, effect } from '@angular/core';
+
+count = signal(0);
+
+constructor() {
+  effect(() => {
+    console.log("Count changed:", this.count());
+  });
+}
+```
+
+---
+
+# How it Works
+
+1. Angular runs the `effect()` function once.
+2. It tracks all signals used inside the function.
+3. Whenever those signals change, the effect runs again.
+
+# Cleaning Up Signal Effects Manually 
+
+In Angular Signals, an `effect()` runs automatically whenever its dependent signals change.
+
+Sometimes we need to **stop the effect manually** to avoid:
+
+- Memory leaks
+- Unnecessary re-execution
+- Running effects after a component is destroyed
+
+  ### Example
+
+```ts
+effect((onCleanup) => {
+
+  const timer = setInterval(() => {
+    console.log("Running timer...");
+  }, 1000);
+
+  onCleanup(() => {
+    clearInterval(timer);
+  });
+
+});
+```
