@@ -2975,3 +2975,383 @@ effect((onCleanup) => {
 
 });
 ```
+# Angular Signals in Service (Readonly Pattern)
+
+This pattern is commonly used when we want to **manage application state inside a service** while preventing components from modifying the state directly.
+
+The idea is:
+
+- Service **owns the writable signal**
+- Components **only read the signal**
+- Only the service **updates the state**
+
+---
+
+# Example Service
+
+```ts
+import { Injectable, signal } from '@angular/core';
+
+@Injectable({
+  providedIn: "root"
+})
+export class CounterService {
+
+  private counterSignal = signal(0);
+
+  readonly counter = this.counterSignal.asReadonly();
+
+  increment() {
+
+    if (this.counter() > 10) {
+      return;
+    }
+
+    this.counterSignal.update(val => val + 1);
+
+  }
+
+}
+```
+
+---
+
+# Code Explanation
+
+### 1️⃣ Private Writable Signal
+
+```ts
+private counterSignal = signal(0);
+```
+
+- This is the **actual state**
+- It can be **updated using `set()` or `update()`**
+- Only the service can modify it
+
+---
+
+### 2️⃣ Readonly Signal
+
+```ts
+readonly counter = this.counterSignal.asReadonly();
+```
+
+This creates a **read-only version of the signal**.
+
+Components can:
+
+- read the value
+- react to changes
+
+But they **cannot modify it**.
+
+---
+
+# Why `asReadonly()` is Important
+
+Without `asReadonly()`, a component could do this:
+
+```ts
+counterService.counter.set(100) ❌
+```
+
+This breaks **state encapsulation**.
+
+Using `asReadonly()` ensures:
+
+- Only the service controls the state
+- Components cannot accidentally modify it
+
+---
+
+# Using the Service in a Component
+
+### Component
+
+```ts
+import { Component } from '@angular/core';
+import { CounterService } from './counter.service';
+
+@Component({
+  selector: 'app-counter',
+  templateUrl: './counter.component.html'
+})
+export class CounterComponent {
+
+  constructor(public counterService: CounterService) {}
+
+  increase() {
+    this.counterService.increment();
+  }
+
+}
+```
+
+---
+
+### Template
+
+```html
+<h2>Count: {{ counterService.counter() }}</h2>
+
+<button (click)="increase()">
+Increase
+</button>
+```
+
+---
+
+# Flow
+
+```
+User clicks button
+      ↓
+Component calls service.increment()
+      ↓
+Service updates counterSignal
+      ↓
+Readonly signal updates
+      ↓
+UI automatically re-renders
+```
+
+---
+
+# Why This Pattern is Used
+
+Benefits:
+
+1. Centralized state management
+2. Prevents unwanted state modification
+3. Makes debugging easier
+4. Encourages clean architecture
+5. Similar to state management patterns like NgRx
+
+---
+
+# Best Practice Rule
+
+```
+Private writable signal → inside service
+Readonly signal → exposed to components
+```
+
+Example structure:
+
+```
+Service
+ ├── private signal()
+ ├── readonly signal.asReadonly()
+ └── methods to update state
+```
+
+---
+
+# Summary
+
+| Concept | Purpose |
+|------|------|
+| `signal()` | Create reactive state |
+| `asReadonly()` | Prevent external modifications |
+| `update()` | Update the signal value |
+| Service pattern | Centralized state management |
+
+# Angular Input Signals vs `@Input()`
+
+Angular introduced **Input Signals** to make component inputs **reactive using signals**.
+
+Before Angular Signals, we used **`@Input()` decorator** to receive data from a parent component.
+
+---
+
+# 1️⃣ Traditional `@Input()` (Before Signals)
+
+`@Input()` allows a parent component to **pass data to a child component**.
+
+### Child Component
+
+```ts
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  templateUrl: './child.component.html'
+})
+export class ChildComponent {
+
+  @Input() count!: number;
+
+}
+```
+
+### Child Template
+
+```html
+<h2>Count: {{ count }}</h2>
+```
+
+### Parent Template
+
+```html
+<app-child [count]="counter"></app-child>
+```
+
+---
+
+# Problem with `@Input()`
+
+When we want to **react to input changes**, we usually need:
+
+- `ngOnChanges`
+- `ngOnInit`
+- manual logic
+
+Example:
+
+```ts
+import { OnChanges, SimpleChanges } from '@angular/core';
+
+ngOnChanges(changes: SimpleChanges) {
+  console.log(changes['count'].currentValue);
+}
+```
+
+This adds **extra boilerplate code**.
+
+---
+
+# 2️⃣ Input Signal (`input()`)
+
+Angular introduced **`input()`** to create **reactive inputs using signals**.
+
+### Child Component
+
+```ts
+import { Component, input } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  templateUrl: './child.component.html'
+})
+export class ChildComponent {
+
+  count = input<number>();
+
+}
+```
+
+### Child Template
+
+```html
+<h2>Count: {{ count() }}</h2>
+```
+
+### Parent Template
+
+```html
+<app-child [count]="counter"></app-child>
+```
+
+---
+
+# Key Difference
+
+| Feature | `@Input()` | `input()` Signal |
+|------|------|------|
+| Reactive | ❌ No | ✅ Yes |
+| Type | Property | Signal |
+| Change tracking | `ngOnChanges` | Automatic |
+| Value access | `count` | `count()` |
+| Derived state | Harder | Easy with `computed()` |
+
+---
+
+# Example with `computed()`
+
+Input signals work very well with **derived signals**.
+
+### Child Component
+
+```ts
+import { Component, input, computed } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  templateUrl: './child.component.html'
+})
+export class ChildComponent {
+
+  count = input<number>();
+
+  doubleCount = computed(() => this.count() * 2);
+
+}
+```
+
+### Template
+
+```html
+<p>Count: {{ count() }}</p>
+<p>Double: {{ doubleCount() }}</p>
+```
+
+Whenever the parent updates `count`, **doubleCount updates automatically**.
+
+---
+
+# Required Input Signal
+
+Angular allows required inputs.
+
+```ts
+count = input.required<number>();
+```
+
+This ensures the parent **must provide the input**.
+
+---
+
+# Default Value Input
+
+You can also provide a default value.
+
+```ts
+count = input(0);
+```
+
+---
+
+# When to Use `input()`
+
+Use `input()` when:
+
+- You are using **Angular Signals**
+- You want **reactive inputs**
+- You want to combine inputs with **computed()**
+- You want **simpler change detection**
+
+---
+
+# Best Practice (Modern Angular)
+
+Prefer **Input Signals** for new Angular applications.
+
+Example pattern:
+
+```
+Parent state → signal()
+Child input → input()
+Derived values → computed()
+Side effects → effect()
+```
+
+---
+
+# Summary
+
+| API | Purpose |
+|----|----|
+| `signal()` | Local reactive state |
+| `input()` | Reactive component input |
+| `computed()` | Derived values |
+| `effect()` | Side effects |
