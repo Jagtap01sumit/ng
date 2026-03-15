@@ -2606,3 +2606,113 @@ export class AppModule { }
 
 ## Angular Pipes
 
+
+# Angular `@defer`
+
+`@defer` allows us to **separate parts of a template into a separate JavaScript bundle** that loads **only when needed**.
+
+### How it works
+
+**Build Time**
+- Angular analyzes templates.
+- Code inside `@defer` is split into a **separate chunk (lazy-loaded JS file).**
+
+**Runtime**
+- The chunk is downloaded **only when the trigger fires**, such as:
+  - viewport
+  - interaction
+  - idle
+
+---
+
+### Example
+
+```html
+@defer (on viewport) {
+  <app-heavy-component />
+}
+```
+### @placeholder
+- If the deferred content is not loaded yet, Angular shows the @placeholder.
+```
+@placeholder {
+  <p>Loading component...</p>
+}
+```
+### @loading
+- @loading appears if the deferred chunk takes time to download.
+
+Behavior
+
+@placeholder appears first.
+
+When the defer trigger fires, Angular starts downloading the chunk.
+
+If the download takes longer than the specified time:
+
+@loading(after X ms)
+
+Angular replaces the placeholder with the loading block.
+
+@loading stays visible for at least the minimum duration.
+
+When the chunk finishes loading:
+
+The actual content appears.
+
+If loading fails, @error is shown.
+
+```
+@defer (on viewport) {
+  <app-chart />
+}
+
+@placeholder {
+  <p>Chart will load soon...</p>
+}
+
+@loading (after 200ms; minimum 1s) {
+  <p>Loading chart...</p>
+}
+
+@error {
+  <p>Failed to load chart</p>
+}
+```
+
+### prefetch Trigger
+
+- The prefetch trigger tells Angular to download the deferred chunk in the background before it is actually needed.
+
+- Benefits
+
+Improves performance.
+
+When the real trigger happens (viewport, interaction), the code is already downloaded.
+
+The component renders instantly.
+
+Important Points
+
+Prefetch does not render the component immediately.
+
+It only downloads the code in advance.
+
+It does not block the main thread.
+
+The browser schedules the download efficiently.
+
+```
+@defer (on interaction; prefetch on hover) {
+  <app-user-profile />
+}
+```
+
+| Trigger          | Description                       |
+| ---------------- | --------------------------------- |
+| `on viewport`    | Loads when element enters screen  |
+| `on interaction` | Loads after user interaction      |
+| `on hover`       | Loads when user hovers            |
+| `on idle`        | Loads when browser is idle        |
+| `when condition` | Loads when condition becomes true |
+
